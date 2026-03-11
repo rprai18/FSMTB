@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>SLB Portal Container</masterLabel>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default">
+            <property name="activeTab"
+                type="String"
+                label="Active Tab"
+                description="enter URL Name of Page without space or special char"
+                default="therapistsearch"
+            />
+
+            <property name="portalHeader"
+                type="String"
+                label="Header"
+                default=""
+            />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

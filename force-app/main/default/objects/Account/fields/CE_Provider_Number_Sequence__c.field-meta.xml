@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CE_Provider_Number_Sequence__c</fullName>
+    <description>Numeric sequence for CE Provider Number (e.g. 1100 for CERP-0001100). Used to compute next number via MAX(); no Custom Setting required.</description>
+    <externalId>false</externalId>
+    <label>CE Provider Number Sequence</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

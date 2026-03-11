@@ -1,0 +1,62 @@
+/* Custom CSS for Salesforce Community - Hide Selected Component */
+
+/* Hide the Hero section/component */
+.hero,
+[data-fqn="forceCommunity:themeHeroStarter"],
+div[tabindex="-1"].hero,
+[class*="hero"] {
+    display: none !important;
+}
+
+/* Alternative: Hide by data attribute if the above doesn't work */
+[data-allow-select="true"][data-fqn="forceCommunity:themeHeroStarter"] {
+    display: none !important;
+}
+
+/* Hide the selected component wrapper */
+.sf-interactions-liveSelected {
+    display: none !important;
+}
+
+/* Ensure profile dropdown appears above navigation LWC */
+/* Target the exact dropdown class from developer tools */
+.profile-menuList,
+.profile-menuList.uiMenuList,
+.profile-menuList.profile-menuList--iconAndName,
+.forceCommunityThemeProfileMenu .profile-menuList,
+.forceCommunityThemeProfileMenu .profile-menuList.uiMenuList,
+.forceCommunityThemeProfileMenu .profile-menuList.profile-menuList--iconAndName {
+    z-index: 10000 !important;
+    position: absolute !important;
+}
+
+/* Also target the overlay if needed */
+.profile-menuListOverlay {
+    z-index: 9999 !important;
+}
+
+/* Add Logout button next to profile name in Community header */
+/* The logout link will be added via JavaScript - this styles it */
+.custom-logout-link {
+    color: #528dca !important;
+    font-weight: 400;
+    cursor: pointer;
+    margin-left: 0.5rem;
+    text-decoration: none;
+    font-family: 'Schibsted Grotesk', Montserrat, sans-serif;
+    display: inline-block;
+}
+
+.custom-logout-link:hover {
+    color: #316ead !important;
+    text-decoration: underline;
+}
+
+/* If you want to hide a specific component, you can also target it by its parent */
+/* Uncomment and customize the selector below based on your component */
+/*
+div.hero > div[data-allow-select="true"] {
+    display: none !important;
+}
+*/
+

@@ -1,0 +1,608 @@
+<template>
+    <div class="content-wrap">
+        <!-- Renewal Completed Popup -->
+        <template if:true={showRenewalCompletedPopup}>
+            <div class="popup__wrapper slds-m-top_large">
+                <div class="custPopup popup__body slds-text-align_center">
+                    <div class="custPopup__message slds-m-bottom_medium">
+                        While processing this renewal, it was completed by another user. Please see the renewal information on the Account Administration page.
+                    </div>
+                    <lightning-button
+                        variant="brand"
+                        label="Ok"
+                        onclick={handleReturnToAdmin}>
+                    </lightning-button>
+                </div>
+            </div>
+        </template>
+
+        <!-- Header Section with Title -->
+        <div class="header-section">
+            <!-- <img src={headerImage0} alt="Header" class="header-section__image"/> -->
+            <h1 class="page-title">
+                <template if:true={isRenewalMode}>Renew CE Provider</template>
+                <template if:false={isRenewalMode}>Register as a CE Provider</template>
+            </h1>
+        </div>
+
+        <!-- Renewal mode: show the renewal form -->
+        <template if:true={isRenewalMode}>
+            <!-- Renewal Content Description -->
+            <template if:true={renewalContent}>
+                <div class="form-description rich-description">
+                    <lightning-formatted-rich-text value={renewalContent}></lightning-formatted-rich-text>
+                </div>
+            </template>
+
+            <div class="detailListform form-container">
+                <div class="section-header">Organization Information</div>
+
+                <div class="form-grid">
+                    <!-- BUSINESS NAME (read only) -->
+                    <div class="form-item">
+                        <label class="field-label">BUSINESS NAME</label>
+                        <div class="display-field">{accountName}</div>
+                    </div>
+
+                    <!-- BUSINESS EMAIL -->
+                    <div class="form-item">
+                        <label class="field-label required">BUSINESS EMAIL</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                type="email"
+                                value={email}
+                                onchange={handleInputChange}
+                                data-field="email"
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+
+                    <!-- BUSINESS STREET -->
+                    <div class="form-item full-width">
+                        <label class="field-label required">BUSINESS STREET</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-textarea
+                                value={address1}
+                                onchange={handleInputChange}
+                                data-field="address1"
+                                variant="label-hidden"
+                                required>
+                            </lightning-textarea>
+                        </div>
+                    </div>
+
+                    <!-- CITY -->
+                    <div class="form-item">
+                        <label class="field-label required">CITY</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                value={city}
+                                onchange={handleInputChange}
+                                data-field="city"
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+
+                    <!-- STATE -->
+                    <div class="form-item">
+                        <label class="field-label required">STATE</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-combobox
+                                value={state}
+                                options={stateOptions}
+                                onchange={handleInputChange}
+                                data-field="state"
+                                variant="label-hidden"
+                                required>
+                            </lightning-combobox>
+                        </div>
+                    </div>
+
+                    <!-- ZIP CODE -->
+                    <div class="form-item">
+                        <label class="field-label required">ZIP CODE</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                value={postalCode}
+                                onchange={handleInputChange}
+                                data-field="postalCode"
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+
+                    <!-- BUSINESS PHONE -->
+                    <div class="form-item">
+                        <label class="field-label required">BUSINESS PHONE</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                type="tel"
+                                placeholder="###-###-####"
+                                value={phone}
+                                onchange={handleInputChange}
+                                data-field="phone"
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+
+                    <!-- BUSINESS FAX -->
+                    <div class="form-item">
+                        <label class="field-label">BUSINESS FAX</label>
+                        <lightning-input
+                            type="tel"
+                            placeholder="###-###-####"
+                            value={fax}
+                            onchange={handleInputChange}
+                            data-field="fax"
+                            variant="label-hidden">
+                        </lightning-input>
+                    </div>
+
+                    <!-- BUSINESS WEBSITE -->
+                    <div class="form-item full-width">
+                        <label class="field-label required">BUSINESS WEBSITE</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                placeholder="http://www.website.com"
+                                value={website}
+                                onchange={handleInputChange}
+                                data-field="website"
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                        <template if:true={displayWebsiteError}>
+                            <span class="field-validation-message">
+                                Business Website is required. Please enter a valid website URL.
+                            </span>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <lightning-button
+                        variant="brand"
+                        label="Next"
+                        onclick={handleNext}
+                        disabled={isSubmitting}>
+                    </lightning-button>
+                </div>
+            </div>
+        </template>
+
+        <!-- Default mode: existing provider registration experience -->
+        <template if:false={isRenewalMode}>
+            <template if:true={contentHtml}>
+                <div class="registration-content">
+                    <lightning-formatted-rich-text value={contentHtml}></lightning-formatted-rich-text>
+                </div>
+            </template>
+
+            <div class="detailListform">
+            <!-- Organization Information -->
+            <div class="pageBlock">
+                <div class="section-header">Organization Information</div>
+
+                <!-- Business Name -->
+                <div class="pageBlockSection columns-2">
+                    <div class="pageBlockSectionItem">
+                        <label class="field-label">Business Name</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                data-field="accountName"
+                                value={accountName}
+                                onchange={handleInputChange}
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+                    <div class="pageBlockSectionItem">
+                        <!-- Empty cell for grid alignment -->
+                    </div>
+                    <template if:true={displayBusinessNameError}>
+                        <div class="pageBlockSectionItem span-2">
+                            <span class="field-validation-message">
+                                Field is required. If you do not have a business name, insert your name here.
+                            </span>
+                        </div>
+                    </template>
+                    <template if:true={displayBusinessNameDuplicationError}>
+                        <div class="pageBlockSectionItem span-2">
+                            <span class="field-validation-message">
+                                The Provider Name already exists in our system. Please provide a new name or contact FSMTB at&nbsp;
+                                <a href="mailto:CE@fsmtb.org?subject=CE Portal Account Name Taken">CE@fsmtb.org</a>
+                                <span>&nbsp;with questions.</span>
+                            </span>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Business Email / Re-enter -->
+                <div class="pageBlockSection columns-2">
+                    <div class="pageBlockSectionItem">
+                        <label class="field-label">Business Email</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                type="email"
+                                data-field="email"
+                                value={email}
+                                onchange={handleInputChange}
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+                    <div class="pageBlockSectionItem">
+                        <label class="field-label">Re-Enter Email</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                type="email"
+                                data-field="emailVerify"
+                                value={emailVerify}
+                                onchange={handleInputChange}
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+                    <template if:true={displayBusinessEmailError}>
+                        <div class="pageBlockSectionItem span-2">
+                            <span class="field-validation-message">
+                                Active email is required and must be formatted as an email address.
+                            </span>
+                        </div>
+                    </template>
+                    <template if:true={displayBusinessEmailReenterError}>
+                        <div class="pageBlockSectionItem span-2">
+                            <span class="field-validation-message">
+                                Email address must match.
+                            </span>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Address 1 / 2 -->
+                <div class="pageBlockSection columns-2">
+                    <div class="pageBlockSectionItem">
+                        <label class="field-label">Business Address 1</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                data-field="address1"
+                                value={address1}
+                                onchange={handleInputChange}
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+                    <div class="pageBlockSectionItem">
+                        <lightning-input
+                            label="Business Address 2"
+                            data-field="address2"
+                            value={address2}
+                            onchange={handleInputChange}>
+                        </lightning-input>
+                    </div>
+                    <template if:true={displayBusinessAddressError}>
+                        <div class="pageBlockSectionItem span-2">
+                            <span class="field-validation-message">
+                                Address is required.
+                            </span>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- City / State / Zip / Phone / Fax -->
+                <div class="pageBlockSection columns-2">
+                    <div class="pageBlockSectionItem">
+                        <label class="field-label">City</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                data-field="city"
+                                value={city}
+                                onchange={handleInputChange}
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+                    <div class="pageBlockSectionItem">
+                        <label class="field-label">State</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-combobox
+                                data-field="state"
+                                value={state}
+                                options={stateOptions}
+                                onchange={handleInputChange}
+                                variant="label-hidden"
+                                required>
+                            </lightning-combobox>
+                        </div>
+                    </div>
+                    <template if:true={displayCityError}>
+                        <div class="pageBlockSectionItem span-2">
+                            <span class="field-validation-message">
+                                City is required.
+                            </span>
+                        </div>
+                    </template>
+
+                    <div class="pageBlockSectionItem">
+                        <label class="field-label">Zip Code</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                data-field="postalCode"
+                                value={postalCode}
+                                onchange={handleInputChange}
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+
+                    <div class="pageBlockSectionItem">
+                        <lightning-input
+                            label="Business Fax"
+                            data-field="fax"
+                            value={fax}
+                            type="tel"
+                            placeholder="###-###-####"
+                            onchange={handleInputChange}>
+                        </lightning-input>
+                    </div>
+
+                    <template if:true={displayZipError}>
+                        <div class="pageBlockSectionItem span-2">
+                            <span class="field-validation-message">
+                                Zip code is required.
+                            </span>
+                        </div>
+                    </template>
+
+                    <div class="pageBlockSectionItem">
+                        <label class="field-label">Business Phone</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                data-field="phone"
+                                value={phone}
+                                type="tel"
+                                placeholder="###-###-####"
+                                onchange={handleInputChange}
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+
+                    <template if:true={displayBusinessPhoneError}>
+                        <div class="pageBlockSectionItem span-2">
+                            <span class="field-validation-message">
+                                Telephone number is required.
+                            </span>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Website -->
+                <div class="pageBlockSection columns-2">
+                    <div class="pageBlockSectionItem">
+                        <label class="field-label">Business Website</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                data-field="website"
+                                value={website}
+                                placeholder="http://www.website.com"
+                                onchange={handleInputChange}
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+                    <div class="pageBlockSectionItem">
+                        <!-- Empty cell for grid alignment -->
+                    </div>
+                    <template if:true={displayWebsiteError}>
+                        <div class="pageBlockSectionItem span-2">
+                            <span class="field-validation-message">
+                                Business Website is required. Please enter a valid website URL.
+                            </span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Registry Account Owner -->
+            <div class="pageBlock">
+                <div class="section-header">Registry Account Owner</div>
+
+                <div class="pageBlockSection columns-1">
+                    <div class="pageBlockSectionItem">
+                        <span>
+                            The registry account owner is ultimately responsible for any information uploaded by users
+                            associated with this provider account.
+                        </span>
+                    </div>
+                </div>
+
+                <!-- First / Last Name -->
+                <div class="pageBlockSection columns-2">
+                    <div class="pageBlockSectionItem">
+                        <label class="field-label">First Name</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                data-field="ownerFirstName"
+                                value={ownerFirstName}
+                                onchange={handleInputChange}
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+                    <div class="pageBlockSectionItem">
+                        <label class="field-label">Last Name</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                data-field="ownerLastName"
+                                value={ownerLastName}
+                                onchange={handleInputChange}
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+                    <template if:true={displayFirstNameError}>
+                        <div class="pageBlockSectionItem">
+                            <span class="field-validation-message">First name is required.</span>
+                        </div>
+                    </template>
+                    <template if:true={displayLastNameError}>
+                        <div class="pageBlockSectionItem">
+                            <span class="field-validation-message">Last name is required.</span>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Username -->
+                <div class="pageBlockSection columns-2">
+                    <div class="pageBlockSectionItem">
+                        <label class="field-label">Username</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                data-field="ownerUsername"
+                                value={ownerUsername}
+                                onchange={handleInputChange}
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+                    <div class="pageBlockSectionItem">
+                        <!-- Empty cell for grid alignment -->
+                    </div>
+                    <template if:true={displayUsernameError}>
+                        <div class="pageBlockSectionItem span-2">
+                            <span class="field-validation-message">
+                                Username is not available, and/or cannot be formatted as an email address.
+                            </span>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Owner Email / Re-enter -->
+                <div class="pageBlockSection columns-2">
+                    <div class="pageBlockSectionItem">
+                        <label class="field-label">Email</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                type="email"
+                                data-field="ownerEmail"
+                                value={ownerEmail}
+                                onchange={handleInputChange}
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+                    <div class="pageBlockSectionItem">
+                        <label class="field-label">Re-Enter Email</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                type="email"
+                                data-field="ownerEmailVerify"
+                                value={ownerEmailVerify}
+                                onchange={handleInputChange}
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                    </div>
+                    <template if:true={displayEmailError}>
+                        <div class="pageBlockSectionItem span-2">
+                            <span class="field-validation-message">
+                                Active email is required and must be formatted as an email address.
+                            </span>
+                        </div>
+                    </template>
+                    <template if:true={displayEmailReenterError}>
+                        <div class="pageBlockSectionItem span-2">
+                            <span class="field-validation-message">
+                                Email address must match.
+                            </span>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Owner Phone / Title -->
+                <div class="pageBlockSection columns-2">
+                    <div class="pageBlockSectionItem">
+                        <label class="field-label">Phone</label>
+                        <div class="requiredInput">
+                            <div class="requiredBlock"></div>
+                            <lightning-input
+                                data-field="ownerPhone"
+                                value={ownerPhone}
+                                type="tel"
+                                placeholder="###-###-####"
+                                onchange={handleInputChange}
+                                variant="label-hidden"
+                                required>
+                            </lightning-input>
+                        </div>
+                        <template if:true={displayPhoneError}>
+                            <span class="field-validation-message">
+                                Telephone number is required.
+                            </span>
+                        </template>
+                    </div>
+                    <div class="pageBlockSectionItem">
+                        <lightning-input
+                            label="Title"
+                            data-field="ownerTitle"
+                            value={ownerTitle}
+                            onchange={handleInputChange}>
+                        </lightning-input>
+                    </div>
+                </div>
+
+                <div class="align-center btn-container">
+                    <lightning-button
+                        variant="brand"
+                        label="Next"
+                        onclick={handleNext}
+                        disabled={isSubmitting}>
+                    </lightning-button>
+                </div>
+            </div>
+            </div>
+        </template>
+    </div>
+</template>

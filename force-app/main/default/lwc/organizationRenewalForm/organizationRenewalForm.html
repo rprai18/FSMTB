@@ -1,0 +1,147 @@
+<template>
+    <div class="content-wrap">
+        <!-- Header Section with Title -->
+        <div class="header-section">
+            <img src={headerImage0} alt="Header" class="header-section__image"/>
+            <h1 class="page-title">Renew CE Provider</h1>
+        </div>
+
+        <!-- Renewal Content Description -->
+        <template if:true={renewalContent}>
+            <div class="form-description rich-description">
+                <lightning-formatted-rich-text value={renewalContent}></lightning-formatted-rich-text>
+            </div>
+        </template>
+
+        <div class="detailListform form-container">
+            <div class="section-header">Organization Information</div>
+
+        <div class="form-grid">
+            <!-- BUSINESS NAME (read only) -->
+            <div class="form-item">
+                <label class="field-label">BUSINESS NAME</label>
+                <div class="display-field">{accountRecord.Name}</div>
+            </div>
+
+            <!-- BUSINESS EMAIL -->
+            <div class="form-item">
+                <label class="field-label required">BUSINESS EMAIL</label>
+                <div class="requiredInput">
+                    <div class="requiredBlock"></div>
+                    <lightning-input
+                        type="email"
+                        value={accountRecord.Email__c}
+                        onchange={handleInputChange}
+                        data-field="Email__c"
+                        variant="label-hidden"
+                        required>
+                    </lightning-input>
+                </div>
+            </div>
+
+            <!-- BUSINESS STREET -->
+            <div class="form-item full-width">
+                <label class="field-label required">BUSINESS STREET</label>
+                <div class="requiredInput">
+                    <div class="requiredBlock"></div>
+                    <lightning-textarea
+                        value={accountRecord.BillingStreet}
+                        onchange={handleInputChange}
+                        data-field="BillingStreet">
+                    </lightning-textarea>
+                </div>
+            </div>
+
+            <!-- CITY -->
+            <div class="form-item">
+                <label class="field-label required">CITY</label>
+                <div class="requiredInput">
+                    <div class="requiredBlock"></div>
+                    <lightning-input
+                        value={accountRecord.BillingCity}
+                        onchange={handleInputChange}
+                        data-field="BillingCity"
+                        variant="label-hidden"
+                        required>
+                    </lightning-input>
+                </div>
+            </div>
+
+            <!-- STATE -->
+            <div class="form-item">
+                <label class="field-label required">STATE</label>
+                <div class="requiredInput">
+                    <div class="requiredBlock"></div>
+                    <lightning-combobox
+                        value={accountRecord.BillingStateCode}
+                        options={stateOptions}
+                        onchange={handleInputChange}
+                        data-field="BillingStateCode"
+                        variant="label-hidden"
+                        required>
+                    </lightning-combobox>
+                </div>
+            </div>
+
+            <!-- ZIP CODE -->
+            <div class="form-item">
+                <label class="field-label required">ZIP CODE</label>
+                <div class="requiredInput">
+                    <div class="requiredBlock"></div>
+                    <lightning-input
+                        value={accountRecord.BillingPostalCode}
+                        onchange={handleInputChange}
+                        data-field="BillingPostalCode"
+                        variant="label-hidden"
+                        required>
+                    </lightning-input>
+                </div>
+            </div>
+
+            <!-- BUSINESS PHONE -->
+            <div class="form-item">
+                <label class="field-label required">BUSINESS PHONE</label>
+                <div class="requiredInput">
+                    <div class="requiredBlock"></div>
+                    <lightning-input
+                        type="tel"
+                        placeholder="###-###-####"
+                        value={accountRecord.Phone}
+                        onchange={handleInputChange}
+                        data-field="Phone"
+                        variant="label-hidden"
+                        required>
+                    </lightning-input>
+                </div>
+            </div>
+
+            <!-- BUSINESS FAX -->
+            <div class="form-item">
+                <label class="field-label">BUSINESS FAX</label>
+                <lightning-input
+                    type="tel"
+                    placeholder="###-###-####"
+                    value={accountRecord.Fax}
+                    onchange={handleInputChange}
+                    data-field="Fax">
+                </lightning-input>
+            </div>
+
+            <!-- BUSINESS WEBSITE -->
+            <div class="form-item full-width">
+                <label class="field-label">BUSINESS WEBSITE</label>
+                <lightning-input
+                    placeholder="http://www.website.com"
+                    value={accountRecord.Website}
+                    onchange={handleInputChange}
+                    data-field="Website">
+                </lightning-input>
+            </div>
+        </div>
+
+            <div class="btn-container">
+                <lightning-button variant="brand" label="Next" onclick={handleNext}></lightning-button>
+            </div>
+        </div>
+    </div>
+</template>

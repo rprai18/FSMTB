@@ -1,0 +1,224 @@
+/* Forgot Username LWC Styles */
+
+.content-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.forgot-username-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+.align-center {
+    text-align: center;
+}
+
+/* Page Header Styles */
+.page-header {
+    background-color: #f8f9fa;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+
+.page-header__content-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.page-header__image {
+    max-height: 100px;
+    width: auto;
+    object-fit: contain;
+}
+
+.page-header__heading {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    flex: 1;
+    min-width: 200px;
+}
+
+/* Title Text */
+.title-text {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+/* Error Message Styles */
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    background-color: #fee;
+    border: 1px solid #fcc;
+    border-radius: 4px;
+    color: #c00;
+    text-align: left;
+}
+
+.error-icon {
+    flex-shrink: 0;
+}
+
+/* Form Styles */
+.login-form {
+    width: 100%;
+    margin-top: 2rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 1.5rem;
+    align-items: center;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #333;
+    text-align: right;
+    padding-right: 1rem;
+}
+
+.form-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.required-indicator {
+    color: #c23934;
+    font-size: 1rem;
+    font-weight: bold;
+    flex-shrink: 0;
+    line-height: 1;
+    margin-top: 0.25rem; /* Slight adjustment to align with input field */
+}
+
+.form-input {
+    flex: 1;
+    width: 100%;
+}
+
+.submit-button {
+    min-width: 120px;
+    justify-self: start;
+}
+
+/* Popup/Confirmation Styles */
+.popup__wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.custPopup {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+}
+
+.popup__body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.custPopup__message {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.button {
+    margin-top: 1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .forgot-username-container {
+        padding: 1rem;
+        margin: 1rem auto;
+    }
+
+    .page-header__content-wrap {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .page-header__image {
+        max-height: 80px;
+    }
+
+    .page-header__heading {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        max-width: 100%;
+    }
+
+    .form-label {
+        text-align: left;
+        padding-right: 0;
+        padding-bottom: 0.25rem;
+    }
+
+    .submit-button {
+        justify-self: center;
+        width: 100%;
+    }
+
+    .custPopup {
+        padding: 1.5rem;
+        width: 95%;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header {
+        padding: 1rem 0;
+    }
+
+    .page-header__heading {
+        font-size: 1.25rem;
+    }
+
+    .title-text {
+        font-size: 0.95rem;
+    }
+
+    .custPopup__message {
+        font-size: 1rem;
+    }
+}
+

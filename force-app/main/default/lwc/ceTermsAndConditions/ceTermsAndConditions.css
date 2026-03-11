@@ -1,0 +1,120 @@
+.terms-text {
+    min-height: 300px;
+    padding: 2rem;
+    border: 2px solid #e5e5e5;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #333333;
+    font-size: 15px;
+    line-height: 1.8;
+    overflow-y: auto;
+    max-height: 600px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 2rem 0;
+}
+
+.terms-text p {
+    margin-bottom: 1rem;
+}
+
+.terms-text ul,
+.terms-text ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.terms-text li {
+    margin-bottom: 0.5rem;
+}
+
+.terms-text h1,
+.terms-text h2,
+.terms-text h3,
+.terms-text h4,
+.terms-text h5,
+.terms-text h6 {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+.terms-text h1 {
+    font-size: 1.5rem;
+}
+
+.terms-text h2 {
+    font-size: 1.25rem;
+}
+
+.terms-text h3 {
+    font-size: 1.1rem;
+}
+
+.content-wrap {
+    padding: 2rem 4rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: #fafafa;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.header-section {
+    margin-bottom: 2rem;
+}
+
+.header-section__image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.page-header__heading {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: #2a71d0;
+}
+
+.footer {
+    background-color: #2a71d0;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    margin-top: 2rem;
+    font-size: 14px;
+}
+
+/* Instruction text styling */
+.content-wrap p.slds-text-heading_small {
+    color: #666666;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+/* Accept button container */
+.accept-button-container {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .content-wrap {
+        padding: 1.5rem;
+    }
+    
+    .terms-text {
+        max-height: 400px;
+        padding: 1.5rem;
+        min-height: 250px;
+    }
+    
+    .page-header__heading {
+        font-size: 1.5rem;
+    }
+}
+

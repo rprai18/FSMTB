@@ -1,0 +1,759 @@
+/* Import portal styles - using content-wrap from global.css */
+/* Schibsted Grotesk Font will be loaded dynamically via JavaScript */
+.course-management-container {
+    font-family: 'Schibsted Grotesk', Montserrat, sans-serif;
+    color: #3e3e3e;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+/* Header Section - matches portal page-header styling */
+.header-section {
+    background-color: #a3c0e1;
+    margin-bottom: 2em;
+    padding: 3em 1em;
+    position: relative;
+    overflow: hidden;
+}
+
+.header-section__image {
+    position: absolute;
+    bottom: 0;
+    height: 100%;
+    right: 0;
+    top: 0;
+    opacity: 0.5;
+    display: block;
+    z-index: 0;
+}
+
+@media screen and (min-width: 40em) {
+    .header-section {
+        padding: 3em 1em;
+        overflow: hidden;
+    }
+    
+    .header-section__image {
+        left: 50%;
+        right: auto;
+        height: 100%;
+        width: auto;
+    }
+}
+
+.page-title {
+    font-size: 2.25em;
+    font-weight: 700;
+    color: #3e3e3c;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    padding: 0;
+    display: block;
+}
+
+@media screen and (min-width: 64em) {
+    .page-title {
+        max-width: 60%;
+    }
+}
+
+/* Banner Styles - matches alert-banner from global.css */
+.banner {
+    align-items: center;
+    color: #fff;
+    display: flex;
+    padding: 1rem 2rem;
+    margin: 1rem 0;
+    border-radius: 4px;
+}
+
+.banner--green {
+    background-color: #25a549;
+}
+
+.banner__inner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.banner__icon-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    min-width: 40px;
+}
+
+.icon-fix {
+    padding-top: 2px;
+}
+
+.banner__text {
+    flex: 1;
+    line-height: 1.2;
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
+/* Action Items Section - matches portal button styles */
+.action-items-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.action-items-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+    min-width: 300px;
+}
+
+.add-course-btn {
+    flex-shrink: 0;
+}
+
+/* Button styles to match portal */
+lightning-button[variant="brand"] {
+    --slds-c-button-brand-color-background: rgba(54, 110, 171);
+    --slds-c-button-brand-color-border: rgba(54, 110, 171);
+    --slds-c-button-brand-color-background-hover: rgba(54, 110, 171);
+    --slds-c-button-brand-color-border-hover: rgba(54, 110, 171);
+    --slds-c-button-brand-color-background-active: rgba(54, 110, 171);
+    --slds-c-button-radius-border: 5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-family: 'Schibsted Grotesk', Montserrat, sans-serif;
+}
+
+lightning-button[variant="base"] {
+    --slds-c-button-text-color: rgba(54, 110, 171);
+    --slds-c-button-text-color-hover: rgba(54, 110, 171);
+    font-weight: 400;
+    font-family: 'Schibsted Grotesk', Montserrat, sans-serif;
+}
+
+.fee-notice {
+    color: #c23934;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.action-items-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 300px;
+}
+
+.policies-btn {
+    align-self: flex-end;
+}
+
+.policies-description {
+    font-size: 0.875rem;
+    color: #3e3e3c;
+    text-align: right;
+}
+
+/* Courses Section - matches portal table styling */
+.courses-section {
+    margin: 2rem 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Table wrapper for horizontal scrolling on mobile */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+    margin: 0;
+    position: relative;
+    box-sizing: border-box;
+}
+
+/* Ensure tables don't overflow their containers */
+.courses-section .slds-table {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.section-header {
+    background: rgba(54, 110, 171);
+    color: #fff;
+    font-size: 1.125em;
+    font-weight: 500;
+    padding: 0.5em;
+    border-radius: 4px 4px 0 0;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 1.125em;
+    font-weight: 500;
+}
+
+/* Table Styles - matches portal table styles */
+.slds-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 0;
+    border: 1px solid #ccc;
+    font-size: 0.875em;
+    display: table;
+    table-layout: auto;
+}
+
+.slds-table th {
+    background-color: #f1f1f1;
+    font-weight: 700;
+    padding: 0.75em;
+    text-align: left;
+    border: 1px solid #ccc;
+    color: #3e3e3c;
+}
+
+.slds-table td {
+    padding: 0.75em;
+    border: 1px solid #ccc;
+}
+
+.slds-table_striped tbody tr:nth-of-type(odd) {
+    background-color: #fff;
+}
+
+.slds-table_striped tbody tr:nth-of-type(even) {
+    background-color: #f1f1f1;
+}
+
+.action-link {
+    color: rgba(54, 110, 171);
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.25s;
+}
+
+.action-link:hover {
+    color: rgba(54, 110, 171);
+    text-decoration: none;
+}
+
+.action-link:active {
+    color: rgba(54, 110, 171);
+}
+
+.empty-state {
+    padding: 2rem;
+    text-align: center;
+    color: #706e6b;
+    background-color: #fafaf9;
+    border: 1px solid #dddbda;
+    border-radius: 0 0 4px 4px;
+}
+
+/* Warning Section - matches portal alert styling */
+.warning-section {
+    display: flex;
+    align-items: flex-start;
+    padding: 1rem;
+    margin-top: 1rem;
+    background-color: #fff4e5;
+    border: 1px solid #ffb75d;
+    border-radius: 4px;
+}
+
+.warning-text {
+    margin: 0;
+    color: #3e3e3c;
+    line-height: 1.5;
+    font-size: 0.875rem;
+}
+
+.warning-icon-col {
+    width: 50px;
+    text-align: center;
+}
+
+/* Modal Styles - matches portal dialog styles */
+.slds-modal__container {
+    max-width: 500px;
+    border-radius: 0;
+}
+
+.slds-modal__container.slds-modal_medium {
+    max-width: 600px;
+}
+
+.slds-modal__header {
+    background-color: rgba(54, 110, 171);
+    color: #fff;
+    border-radius: 0;
+}
+
+.slds-modal__title {
+    font-family: 'Schibsted Grotesk', Montserrat, sans-serif;
+    font-weight: 700;
+}
+
+.popup-message {
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
+    color: #3e3e3c;
+    font-family: 'Schibsted Grotesk', Montserrat, sans-serif;
+}
+
+.email-link {
+    color: rgba(54, 110, 171);
+    text-decoration: none;
+    transition: color 0.25s;
+}
+
+.email-link:hover {
+    color: rgba(54, 110, 171);
+    text-decoration: none;
+}
+
+.email-link:active {
+    color: rgba(54, 110, 171);
+}
+
+/* Backdrop for modals */
+.slds-backdrop {
+    background-color: rgba(158, 158, 158, 0.5);
+}
+
+/* Flow Modal Styles */
+.slds-modal_large .slds-modal__container {
+    max-width: 90%;
+    width: 90%;
+}
+
+.flow-modal-container {
+    max-width: 90%;
+    width: 90%;
+}
+
+.flow-modal-content {
+    min-height: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.slds-modal__close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    margin-left: 0.25rem;
+    width: 2rem;
+    height: 2rem;
+}
+
+/* Responsive Design */
+
+/* Tablet (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .header-section {
+        padding: 2.5em 1.5em;
+    }
+
+    .page-title {
+        font-size: 2em;
+    }
+
+    .action-items-section {
+        margin: 1.5rem 0;
+    }
+
+    .action-items-left {
+        min-width: 250px;
+    }
+
+    .banner {
+        padding: 0.875rem 1.5rem;
+    }
+
+    .banner__text {
+        font-size: 0.95rem;
+    }
+
+    .section-header {
+        font-size: 1.05em;
+    }
+
+    .slds-table {
+        font-size: 0.8rem;
+    }
+
+    .slds-table th,
+    .slds-table td {
+        padding: 0.65em;
+    }
+
+    .courses-section {
+        margin: 1.5rem 0;
+    }
+
+    .slds-modal__container {
+        max-width: 85%;
+    }
+}
+
+/* Mobile (up to 768px) */
+@media (max-width: 768px) {
+    .course-management-container {
+        padding: 0 0.5rem;
+    }
+
+    .header-section {
+        padding: 1.5em 1em;
+        margin-bottom: 1.5em;
+    }
+
+    .header-section__image {
+        opacity: 0.3;
+    }
+
+    .page-title {
+        font-size: 1.75em;
+        line-height: 1.2;
+    }
+
+    .banner {
+        padding: 0.75rem 1rem;
+        margin: 0.75rem 0;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .banner__inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .banner__icon-group {
+        min-width: auto;
+    }
+
+    .banner__text {
+        font-size: 0.875rem;
+        line-height: 1.4;
+    }
+
+    .action-items-section {
+        flex-direction: column;
+        margin: 1.5rem 0;
+        gap: 1rem;
+    }
+
+    .action-items-left {
+        width: 100%;
+        min-width: auto;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .add-course-btn {
+        width: 100%;
+    }
+
+    .fee-notice {
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+
+    .action-items-right {
+        width: 100%;
+        min-width: auto;
+        align-items: flex-start;
+    }
+
+    .policies-description {
+        text-align: left;
+        font-size: 0.8rem;
+    }
+
+    .courses-section {
+        margin: 1.5rem 0;
+    }
+
+    .section-header {
+        font-size: 1em;
+        padding: 0.4em;
+    }
+
+    /* Make tables horizontally scrollable on mobile */
+    .courses-section {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow: visible;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        -ms-overflow-style: -ms-autohiding-scrollbar;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    .slds-table {
+        font-size: 0.75rem;
+        min-width: 600px; /* Minimum width to maintain readability */
+        width: auto;
+        max-width: none;
+        display: table;
+        margin: 0;
+    }
+
+    .slds-table th,
+    .slds-table td {
+        padding: 0.5em 0.4em;
+        white-space: nowrap;
+    }
+
+    .slds-table th {
+        font-size: 0.7rem;
+    }
+
+    .action-link {
+        font-size: 0.75rem;
+        padding: 0.25rem 0;
+        display: inline-block;
+    }
+
+    .warning-section {
+        padding: 0.75rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .warning-text {
+        font-size: 0.8rem;
+    }
+
+    .empty-state {
+        padding: 1.5rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    /* Modal adjustments for mobile */
+    .slds-modal__container {
+        max-width: 95%;
+        margin: 1rem auto;
+    }
+
+    .slds-modal__container.slds-modal_medium {
+        max-width: 95%;
+    }
+
+    .slds-modal__header {
+        padding: 1rem;
+    }
+
+    .slds-modal__title {
+        font-size: 1.125rem;
+    }
+
+    .slds-modal__content {
+        padding: 1rem;
+    }
+
+    .popup-message {
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+
+    .slds-modal__footer {
+        padding: 0.75rem 1rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .slds-modal__footer lightning-button {
+        width: 100%;
+    }
+}
+
+/* Small Mobile (up to 480px) */
+@media (max-width: 480px) {
+    .course-management-container {
+        padding: 0 0.25rem;
+    }
+
+    .header-section {
+        padding: 1em 0.75em;
+        margin-bottom: 1em;
+    }
+
+    .page-title {
+        font-size: 1.5em;
+    }
+
+    .banner {
+        padding: 0.625rem 0.75rem;
+        margin: 0.5rem 0;
+    }
+
+    .banner__text {
+        font-size: 0.8rem;
+    }
+
+    .action-items-section {
+        margin: 1rem 0;
+    }
+
+    .action-items-left {
+        gap: 0.5rem;
+    }
+
+    .fee-notice {
+        font-size: 0.75rem;
+    }
+
+    .courses-section {
+        margin: 1rem 0;
+    }
+
+    .section-header {
+        font-size: 0.95em;
+        padding: 0.35em;
+    }
+
+    .courses-section {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .slds-table {
+        font-size: 0.7rem;
+        min-width: 550px;
+        width: auto;
+        max-width: none;
+    }
+
+    .slds-table th,
+    .slds-table td {
+        padding: 0.4em 0.3em;
+    }
+
+    .slds-table th {
+        font-size: 0.65rem;
+    }
+
+    .action-link {
+        font-size: 0.7rem;
+    }
+
+    .warning-section {
+        padding: 0.625rem;
+    }
+
+    .warning-text {
+        font-size: 0.75rem;
+    }
+
+    .empty-state {
+        padding: 1rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .slds-modal__container {
+        max-width: 98%;
+        margin: 0.5rem auto;
+    }
+
+    .slds-modal__header {
+        padding: 0.75rem;
+    }
+
+    .slds-modal__title {
+        font-size: 1rem;
+    }
+
+    .slds-modal__content {
+        padding: 0.75rem;
+    }
+
+    .popup-message {
+        font-size: 0.8rem;
+    }
+}
+
+/* Extra Small Mobile (up to 360px) */
+@media (max-width: 360px) {
+    .page-title {
+        font-size: 1.25em;
+    }
+
+    .banner__text {
+        font-size: 0.75rem;
+    }
+
+    .courses-section {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .slds-table {
+        font-size: 0.65rem;
+        min-width: 500px;
+        width: auto;
+        max-width: none;
+    }
+
+    .slds-table th {
+        font-size: 0.6rem;
+    }
+
+    .action-link {
+        font-size: 0.65rem;
+    }
+}
+
+/* Large Desktop (above 1440px) */
+@media (min-width: 1441px) {
+    .course-management-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .header-section {
+        padding: 3.5em 2em;
+    }
+
+    .page-title {
+        font-size: 2.5em;
+    }
+
+    .courses-section {
+        margin: 2.5rem 0;
+    }
+
+    .slds-table {
+        font-size: 0.9rem;
+    }
+}

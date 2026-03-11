@@ -1,0 +1,236 @@
+/* Match CeSlbPceReport styling: gradient header, pod cards, table polish */
+.therapist-report-container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 1.25rem 2.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.page-header {
+    background: linear-gradient(135deg, #0176d3 0%, #0d9dda 100%);
+    padding: 2rem 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.page-header .content-wrap {
+    max-width: none;
+    padding: 0;
+    margin: 0;
+}
+
+.page-header__heading {
+    font-size: 1.625rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.content-wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+}
+
+.therapist-report__header-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.therapist-report__name {
+    font-size: 1.375rem;
+    font-weight: 700;
+    margin: 0;
+    color: #181818;
+}
+
+.therapist-report__results {
+    margin-top: 0;
+}
+
+.results-pod {
+    margin-top: 0;
+    margin-bottom: 1.25rem;
+    padding: 0;
+    background: #fff;
+    border: 1px solid #dddbda;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.results-pod__heading {
+    background-color: #0176d3;
+    color: #fff;
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    margin: 0;
+}
+
+.results-pod__content {
+    background: #fff;
+    padding: 1.25rem;
+    border-radius: 0;
+}
+
+.info-pod__content {
+    padding: 1.25rem;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem 2rem;
+}
+
+.info-pod__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.info-pod__item-label {
+    font-weight: 600;
+    color: #706e6b;
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.info-pod__item-content {
+    color: #181818;
+    font-size: 0.9375rem;
+    line-height: 1.45;
+}
+
+.info-pod__item-description {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #706e6b;
+    line-height: 1.45;
+}
+
+.grid {
+    display: block;
+}
+
+.grid__item {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.table__header-row {
+    background-color: #f3f3f3;
+}
+
+.table__row {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.table__heading {
+    padding: 0.625rem 0.875rem;
+    text-align: left;
+    font-weight: 600;
+    color: #3e3e3c;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.table__data-cell {
+    padding: 0.625rem 0.875rem;
+    color: #080707;
+    font-size: 0.875rem;
+}
+
+.table__data-row:hover {
+    background-color: #f9f9f9;
+}
+
+.table tbody tr:last-child.table__data-row td {
+    border-bottom: none;
+}
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #e5e5e5;
+    font-size: 0.875rem;
+    color: #3e3e3c;
+}
+
+.legend__item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.legend__icon {
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.img--action-indicator {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    object-fit: contain;
+}
+
+.pce-action-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    display: block;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .therapist-report-container {
+        padding: 0 1rem 1.5rem;
+    }
+    
+    .content-wrap {
+        padding: 0 1rem;
+    }
+    
+    .page-header__heading {
+        font-size: 1.375rem;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .therapist-report__header-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .table__heading,
+    .table__data-cell {
+        padding: 0.5rem 0.625rem;
+        font-size: 0.8125rem;
+    }
+}

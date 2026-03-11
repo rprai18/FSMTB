@@ -1,0 +1,182 @@
+<template>
+    <div class="pce-report-container">
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+
+        <template if:true={error}>
+            <div class="slds-m-around_medium slds-text-color_error">
+                {error}
+            </div>
+        </template>
+
+        <template if:true={data}>
+            <header class="pce-report-header">
+                <h1 class="pce-report-header__title">Professional Continuing Education Record</h1>
+            </header>
+
+            <div class="pce-report-therapist">
+                <!-- <div class="pce-report-therapist__image-placeholder">therapist image</div> -->
+                <h2 class="pce-report-therapist__name">{data.therapistName}</h2>
+            </div>
+
+            <!-- State Licensing -->
+            <div class="pce-report-pod">
+                <div class="pce-report-pod__heading">State Licensing</div>
+                <div class="pce-report-pod__content">
+                    <template if:true={hasStateLicenses}>
+                        <table class="pce-report-table">
+                            <thead>
+                                <tr>
+                                    <th>State</th>
+                                    <th>Number</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Issue Date</th>
+                                    <th>Expiration Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={data.stateLicenses} for:item="lic">
+                                    <tr key={lic.licenseNumber}>
+                                        <td>{lic.source}</td>
+                                        <td>{lic.licenseNumber}</td>
+                                        <td>{lic.licenseType}</td>
+                                        <td>{lic.status}</td>
+                                        <td>{lic.issueDateFormatted}</td>
+                                        <td>{lic.expirationDateFormatted}</td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </template>
+                    <template if:false={hasStateLicenses}>
+                        <p class="slds-m-around_small">No state licensing records.</p>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Adjustment -->
+            <div class="pce-report-pod">
+                <div class="pce-report-pod__heading">Adjustment</div>
+                <div class="pce-report-pod__content">
+                    <template if:true={hasAdjustments}>
+                        <table class="pce-report-table">
+                            <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template for:each={data.adjustments} for:item="adj">
+                                    <tr key={adj.uniqueKey}>
+                                        <td>{adj.action}</td>
+                                        <td>{adj.startDateFormatted}</td>
+                                        <td>{adj.endDateFormatted}</td>
+                                        <td>{adj.reason}</td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </template>
+                    <template if:false={hasAdjustments}>
+                        <p class="slds-m-around_small">No adjustments.</p>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Course Information -->
+            <div class="pce-report-pod" if:true={hasCourseInfo}>
+                <div class="pce-report-pod__heading">Course Information</div>
+                <div class="pce-report-pod__content">
+                    <div class="pce-report-grid">
+                        <div class="pce-report-grid__col">
+                            <div class="pce-report-field">
+                                <span class="pce-report-field__label">COURSE NAME</span>
+                                <span class="pce-report-field__value">{data.courseInfo.courseName}</span>
+                            </div>
+                            <div class="pce-report-field">
+                                <span class="pce-report-field__label">COURSE PROVIDER</span>
+                                <span class="pce-report-field__value">{data.courseInfo.courseProvider}</span>
+                            </div>
+                            <div class="pce-report-field">
+                                <span class="pce-report-field__label">COURSE CATEGORY</span>
+                                <span class="pce-report-field__value">{data.courseInfo.courseCategory}</span>
+                            </div>
+                            <div class="pce-report-field">
+                                <span class="pce-report-field__label">DESCRIPTION</span>
+                                <span class="pce-report-field__value pce-report-field__value--block">{data.courseInfo.description}</span>
+                            </div>
+                        </div>
+                        <div class="pce-report-grid__col">
+                            <div class="pce-report-field">
+                                <span class="pce-report-field__label">COURSE ID</span>
+                                <span class="pce-report-field__value">{data.courseInfo.courseId}</span>
+                            </div>
+                            <div class="pce-report-field">
+                                <span class="pce-report-field__label">REGISTRATION PHONE</span>
+                                <span class="pce-report-field__value">{data.courseInfo.registrationPhone}</span>
+                            </div>
+                            <div class="pce-report-field">
+                                <span class="pce-report-field__label">REGISTRATION WEBSITE</span>
+                                <span class="pce-report-field__value">{data.courseInfo.registrationWebsite}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Information -->
+            <div class="pce-report-pod" if:true={hasSessionInfo}>
+                <div class="pce-report-pod__heading">Session Information</div>
+                <div class="pce-report-pod__content">
+                    <div class="pce-report-grid">
+                        <div class="pce-report-grid__col">
+                            <div class="pce-report-field">
+                                <span class="pce-report-field__label">SESSION TYPE</span>
+                                <span class="pce-report-field__value">{data.sessionInfo.sessionType}</span>
+                            </div>
+                            <div class="pce-report-field">
+                                <span class="pce-report-field__label">HOURS EARNED</span>
+                                <span class="pce-report-field__value">{data.sessionInfo.hoursEarned}</span>
+                            </div>
+                            <div class="pce-report-field">
+                                <span class="pce-report-field__label">HANDS ON %</span>
+                                <span class="pce-report-field__value">{data.sessionInfo.handsOnPercent}</span>
+                            </div>
+                            <div class="pce-report-field">
+                                <span class="pce-report-field__label">LECTURE %</span>
+                                <span class="pce-report-field__value">{data.sessionInfo.lecturePercent}</span>
+                            </div>
+                            <div class="pce-report-field">
+                                <span class="pce-report-field__label">COMPLETED ON</span>
+                                <span class="pce-report-field__value">{data.sessionInfo.completedOnFormatted}</span>
+                            </div>
+                        </div>
+                        <div class="pce-report-grid__col">
+                            <div class="pce-report-field">
+                                <span class="pce-report-field__label">SESSION ID</span>
+                                <span class="pce-report-field__value">{data.sessionInfo.sessionId}</span>
+                            </div>
+                            <div class="pce-report-field">
+                                <span class="pce-report-field__label">INSTRUCTOR</span>
+                                <span class="pce-report-field__value">{data.sessionInfo.instructor}</span>
+                            </div>
+                            <div class="pce-report-field">
+                                <span class="pce-report-field__label">CITY</span>
+                                <span class="pce-report-field__value">{data.sessionInfo.city}</span>
+                            </div>
+                            <div class="pce-report-field">
+                                <span class="pce-report-field__label">STATE</span>
+                                <span class="pce-report-field__value">{data.sessionInfo.state}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</template>

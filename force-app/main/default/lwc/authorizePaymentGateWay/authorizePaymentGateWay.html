@@ -1,0 +1,103 @@
+<template>
+    <div class="form-container">
+        <h2 class="form-title">Credit Card Information</h2>
+
+        <!-- Card Number -->
+        <lightning-input
+            label="Card Number"
+            value={cardNumber}
+            onchange={handleInputChange}
+            name="cardNumber"
+            type="text"
+            maxlength="16">
+        </lightning-input>
+
+        <!-- Expiration Date -->
+        <div class="exp-date">
+            <lightning-combobox
+                label="Expiration Month"
+                value={expMonth}
+                options={monthOptions}
+                onchange={handleInputChange}
+                name="expMonth">
+            </lightning-combobox>
+
+            <lightning-combobox
+                label="Expiration Year"
+                value={expYear}
+                options={yearOptions}
+                onchange={handleInputChange}
+                name="expYear">
+            </lightning-combobox>
+        </div>
+
+        <!-- Security Code -->
+        <lightning-input
+            label="Security Code"
+            value={cvv}
+            onchange={handleInputChange}
+            name="cvv"
+            type="password"
+            maxlength="4">
+        </lightning-input>
+
+        <!-- First & Last Name -->
+        <lightning-input
+            label="First Name"
+            value={firstName}
+            onchange={handleInputChange}
+            name="firstName">
+        </lightning-input>
+
+        <lightning-input
+            label="Last Name"
+            value={lastName}
+            onchange={handleInputChange}
+            name="lastName">
+        </lightning-input>
+
+        <!-- Billing Address -->
+        <lightning-input
+            label="Billing Address"
+            value={billingAddress}
+            onchange={handleInputChange}
+            name="billingAddress">
+        </lightning-input>
+
+        <lightning-input
+            label="Billing City"
+            value={billingCity}
+            onchange={handleInputChange}
+            name="billingCity">
+        </lightning-input>
+
+        <lightning-combobox
+            label="Billing State"
+            value={billingState}
+            options={stateOptions}
+            onchange={handleInputChange}
+            name="billingState">
+        </lightning-combobox>
+
+        <lightning-input
+            label="Billing Zip Code"
+            value={billingZip}
+            onchange={handleInputChange}
+            name="billingZip"
+            maxlength="10">
+        </lightning-input>
+
+        <!-- Disclaimer -->
+        <p class="disclaimer">
+            By clicking this button, I authorize payment. Please press "Submit" only once.
+        </p>
+
+        <!-- Submit Button -->
+        <lightning-button
+            class="submit-btn"
+            variant="brand"
+            label="Submit"
+            onclick={handleSubmit}>
+        </lightning-button>
+    </div>
+</template>

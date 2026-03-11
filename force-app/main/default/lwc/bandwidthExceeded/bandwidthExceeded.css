@@ -1,0 +1,79 @@
+/* Bandwidth Exceeded LWC Styles */
+
+.content-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.bandwidth-exceeded-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+/* Page Header Styles */
+.page-header {
+    background-color: #f8f9fa;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+
+.page-header__content-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.page-header__heading {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+/* Error Message Styles */
+.error-message {
+    font-size: 1.25rem;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 1.5rem;
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 4px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .bandwidth-exceeded-container {
+        padding: 1rem;
+        margin: 1rem auto;
+    }
+
+    .page-header {
+        padding: 1rem 0;
+    }
+
+    .page-header__heading {
+        font-size: 1.5rem;
+    }
+
+    .error-message {
+        font-size: 1.1rem;
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header__heading {
+        font-size: 1.25rem;
+    }
+
+    .error-message {
+        font-size: 1rem;
+    }
+}
+

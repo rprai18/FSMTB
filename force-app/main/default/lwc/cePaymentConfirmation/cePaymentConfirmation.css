@@ -1,0 +1,38 @@
+/* Header Section */
+.header-section__image {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.page-header {
+    margin-bottom: 2rem;
+}
+
+.page-header__heading {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.content-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.content-wrap p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.footer {
+    text-align: center;
+    padding: 2rem 0;
+    margin-top: 3rem;
+    border-top: 1px solid #e0e0e0;
+    color: #666;
+}
+

@@ -1,0 +1,95 @@
+<template>
+    <div class="login-page-container">
+        <!-- Top Header with Logo -->
+        <header class="top-header">
+            <div class="top-header__content content-wrap">
+                <div class="top-header__logo-container">
+                    <img src={fsmtbLogoUrl} alt="FSMTB Logo" class="top-header__logo" onerror={handleLogoError}/>
+                </div>
+                <div class="top-header__text">
+                    <div class="top-header__title">FSMTB</div>
+                    <div class="top-header__subtitle">FEDERATION OF STATE</div>
+                    <div class="top-header__subtitle">MASSAGE THERAPY BOARDS</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Banner Section with Title -->
+        <div class="banner-section">
+            <div class="banner-section__content content-wrap">
+                <h1 class="banner-section__title">CE Registry</h1>
+            </div>
+            <template if:true={bannerImageUrl}>
+                <img src={bannerImageUrl} alt="Banner Background" class="banner-section__image" onerror={handleBannerImageError}/>
+            </template>
+        </div>
+
+        <!-- Login Form -->
+        <div class="login-form align-center">
+            <div class="content-wrap">
+                <p class="welcome-message">{welcomeMessage}</p>
+
+                <!-- Error Message Display -->
+                <template if:true={errorMessage}>
+                    <div class="error-message">
+                        {errorMessage}
+                    </div>
+                </template>
+
+                <div class="login-form-container">
+                    <div class="form-row">
+                        <label for="username" class="form-label">{siteInfo.usernameLabel}</label>
+                        <lightning-input
+                            id="username"
+                            type="text"
+                            value={username}
+                            onchange={handleUsernameChange}
+                            class="form-input">
+                        </lightning-input>
+                    </div>
+
+                    <div class="form-row">
+                        <label for="password" class="form-label">{siteInfo.passwordLabel}</label>
+                        <lightning-input
+                            id="password"
+                            type="password"
+                            value={password}
+                            onchange={handlePasswordChange}
+                            class="form-input">
+                        </lightning-input>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-spacer"></div>
+                        <lightning-button
+                            label={siteInfo.loginButtonLabel}
+                            variant="brand"
+                            onclick={handleLogin}
+                            disabled={isLoading}
+                            class="login-button">
+                        </lightning-button>
+                    </div>
+
+                    <div class="form-row links-row">
+                        <div class="form-spacer"></div>
+                        <div class="links-container">
+                            <a href="#" onclick={handleForgotUsername} class="link-text">Forgot Your Username?</a>
+                            <template if:true={showForgotPassword}>
+                                <a href="#" onclick={handleForgotPassword} class="link-text">{siteInfo.forgotPasswordLabel}</a>
+                            </template>
+                            <a href="#" onclick={handleRegisterAsProvider} class="link-text">Register as a CE Provider</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <!-- <footer class="page-footer">
+            <div class="footer-content">
+                <p class="footer-text">©2025 FSMTB ALL RIGHTS RESERVED.</p>
+            </div>
+        </footer> -->
+    </div>
+</template>
+

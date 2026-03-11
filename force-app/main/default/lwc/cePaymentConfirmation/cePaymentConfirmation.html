@@ -1,0 +1,51 @@
+<template>
+    <!-- Loading State -->
+    <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </template>
+    
+    <!-- Main Content -->
+    <template if:false={isLoading}>
+        <!-- Navigation Bar (for authenticated admin users) -->
+        <template if:true={isUserAdmin}>
+            <template if:true={isCE_Registry}>
+                <!-- CE Registry Navigation - would need to import cePortalNavigation if available -->
+                <!-- For now, navigation is handled by the page layout -->
+            </template>
+        </template>
+        
+        <!-- Header Section -->
+        <header class="page-header">
+            <div class="content-wrap">
+                <!-- <img src={headerImage} alt="Header" class="header-section__image"/> -->
+                <h1 class="page-header__heading">{pageHeading}</h1>
+            </div>
+        </header>
+        
+        <!-- Content Section -->
+        <div class="content-wrap">
+            <!-- Message for Admin Users -->
+            <template if:true={showAdminMessage}>
+                <p>
+                    Your payment has been successfully processed. You will receive a payment confirmation email to keep for your records.
+                </p>
+            </template>
+            
+            <!-- Message for New Users (Non-Admin) -->
+            <template if:true={showNewUserMessage}>
+                <p>
+                    Your payment has been successfully processed. You will receive a payment confirmation email for your records at the email you used to register this account.
+                </p>
+                <p>
+                    You will also receive an email in the next few minutes to set your password.
+                </p>
+            </template>
+        </div>
+    </template>
+    
+    <!-- Footer -->
+    <div class="footer">
+        ©2025 FSMTB ALL RIGHTS RESERVED.
+    </div>
+</template>
+

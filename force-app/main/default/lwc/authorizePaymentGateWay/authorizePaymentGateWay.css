@@ -1,0 +1,28 @@
+.form-container {
+    max-width: 450px;
+    margin: auto;
+    padding: 20px;
+    background: #fff;
+}
+
+.form-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.exp-date {
+    display: flex;
+    gap: 10px;
+}
+
+.disclaimer {
+    font-size: 12px;
+    margin-top: 15px;
+    color: #555;
+}
+
+.submit-btn {
+    margin-top: 15px;
+    width: 100%;
+}

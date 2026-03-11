@@ -1,0 +1,162 @@
+/* Match CeSlbPceReport / CeSlbTherapistReport styling */
+.slb-reports-container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 1.25rem 2.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.page-header {
+    background: linear-gradient(135deg, #0176d3 0%, #0d9dda 100%);
+    padding: 2rem 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.page-header__title-row {
+    display: flex;
+    justify-content: center;
+}
+
+.page-header__heading {
+    font-size: 1.625rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.slb-reports-page {
+    margin-top: 0;
+}
+
+.slb-reports-page__header-content {
+    margin-bottom: 1.5rem;
+}
+
+.field {
+    margin-bottom: 1rem;
+}
+
+.label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #3e3e3c;
+}
+
+.label--bold {
+    text-transform: none;
+}
+
+.slb-reports-page__results > p {
+    color: #706e6b;
+    font-size: 0.9375rem;
+    margin: 0.75rem 0;
+}
+
+/* Therapist section: blue banner + table(s) */
+.therapist-section {
+    margin-bottom: 2rem;
+    border: 1px solid #dddbda;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.therapist-section__banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    background-color: #0176d3;
+    color: #fff;
+}
+
+.therapist-section__name {
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+}
+
+.therapist-section__name:hover {
+    text-decoration: underline;
+}
+
+.therapist-section__link {
+    color: #fff;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.therapist-section__link:hover {
+    opacity: 0.9;
+}
+
+.therapist-section__table-wrap {
+    overflow-x: auto;
+    border-top: 1px solid #e5e5e5;
+}
+
+.therapist-section__subsection {
+    margin-bottom: 1rem;
+}
+
+.therapist-section__subsection:last-child {
+    margin-bottom: 0;
+}
+
+.therapist-section__subheading {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 1rem 0 0.5rem 0;
+    padding: 0 0.25rem;
+    color: #3e3e3c;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.report-table th,
+.report-table td {
+    padding: 0.625rem 0.875rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.report-table thead th {
+    background-color: #f3f3f3;
+    font-weight: 600;
+    color: #3e3e3c;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.report-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.report-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.report-table td {
+    color: #080707;
+}
+
+@media (max-width: 768px) {
+    .slb-reports-container {
+        padding: 0 1rem 1.5rem;
+    }
+    
+    .page-header__heading {
+        font-size: 1.375rem;
+    }
+}

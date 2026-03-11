@@ -1,0 +1,130 @@
+.slb-page {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+}
+
+.slb-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #fff;
+}
+
+.slb-headerRow {
+    padding: 0px 10px;
+}
+
+.slb-topbar {
+    height: 4px;
+    background: #2f6fbd;
+}
+
+.slb-content {
+    flex: 1 1 auto;
+    overflow: auto;
+}
+
+.slb-logo {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: #1b96ff;
+}
+
+.slb-vertical-divider {
+    height: 28px;
+    width: 1px;
+    background-color: #d8dde6;
+}
+
+.slb-subtitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #2f6fbd;
+    letter-spacing: 0.3px;
+}
+
+.slb-tabsWrap{
+    display: flex;
+}
+
+.slb-tabs{
+    display: inline-flex;
+    align-items: stretch;
+    gap: 0;                         
+    overflow: hidden;
+    background: #f3f3f3;
+    position: relative;
+    z-index: 2;
+}
+
+.slb-tab{
+    border: 0;
+    background: transparent;
+    padding: 20px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #2e2e2e;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.slb-tab + .slb-tab{
+    border-left: 1px solid #d8dde6;
+}
+
+.slb-tab_active{
+    background: #2f6fbd;
+    color: #fff;
+    border-bottom: none;
+    box-shadow: 0 10px 0 #2f6fbd;
+    border-radius: 5px 5px 0px 0px;
+}
+
+.slb-tab:not(.slb-tab_active):hover{
+    background: #e9eef6;
+}
+
+.portal-header__logo {
+    height: 35px;
+    width: auto;
+    object-fit: contain;
+}
+
+/* Gear Icon Button */
+.gear-icon-button {
+    background: none;
+    border: none;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(54, 110, 171);
+    border-radius: 0;
+    flex-shrink: 0;
+}
+
+.gear-icon-button:hover {
+    color: rgba(54, 110, 171);
+    background-color: #f0f0f0;
+}
+
+.gear-icon-button:focus {
+    outline: 2px solid rgba(54, 110, 171);
+    outline-offset: 2px;
+}
+
+.gear-icon {
+    --slds-c-icon-color-foreground-default: rgba(54, 110, 171);
+    width: 1.25rem;
+    height: 1.25rem;
+    line-height: 1;
+    vertical-align: middle;
+}
+
+.gear-icon-button:hover .gear-icon {
+    --slds-c-icon-color-foreground-default: rgba(54, 110, 171);
+}

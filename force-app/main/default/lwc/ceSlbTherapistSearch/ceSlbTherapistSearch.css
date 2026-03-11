@@ -1,0 +1,442 @@
+/* Host-level overrides to prevent parent container styles */
+:host {
+    display: block;
+    width: 100%;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Main Container */
+.slb-therapist-search-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Prevent any parent content-wrap from affecting our component */
+:host .content-wrap,
+.content-wrap .slb-therapist-search-container {
+    padding: 0 !important;
+    margin: 0 auto !important;
+    max-width: 1200px !important;
+    background: transparent !important;
+}
+
+/* Page Header */
+.page-header {
+    margin-bottom: 20px;
+    background: none;
+    max-width: 960px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 20px;
+}
+
+.page-header__title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.page-header__heading {
+    font-size: 2em;
+    color: #333;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+.participating-states-link {
+    color: #0070d2;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    margin-left: 20px;
+}
+
+.participating-states-link:hover {
+    color: #005fb2;
+}
+
+/* Search Form Section */
+.search-form-section {
+    background-color: transparent !important;
+    max-width: 960px;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Search Form */
+.therapist-search-form {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+}
+
+/* Form Error Message */
+.form-error-message {
+    background-color: #f4f4f4;
+    border-left: 4px solid #c23934;
+    padding: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.form-error-message__icon {
+    margin-right: 8px;
+}
+
+/* Search Fields Container */
+.search-fields-container {
+    padding: 0 20px;
+}
+
+/* Search Field */
+.search-field {
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.field-label {
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #080707;
+    margin-bottom: 8px;
+    display: block;
+    width: 100%;
+}
+
+.field-input-wrapper {
+    margin-top: 0;
+    width: 100%;
+}
+
+/* Input Field Styling */
+.search-input {
+    width: 100%;
+}
+
+lightning-input .slds-input {
+    border: 1px solid #dddbda !important;
+    border-radius: 0.25rem !important;
+    background-color: #ffffff !important;
+    box-shadow: none !important;
+    padding: 0.5rem !important;
+}
+
+lightning-input .slds-input:focus {
+    border-color: #1589ee !important;
+    box-shadow: 0 0 3px #1589ee !important;
+    outline: none !important;
+}
+
+/* Dual Listbox Styling */
+.state-listbox {
+    width: 100%;
+}
+
+lightning-dual-listbox .slds-dual-listbox {
+    border: 1px solid #dddbda !important;
+    border-radius: 0.25rem !important;
+    background-color: #ffffff !important;
+    box-shadow: none !important;
+}
+
+lightning-dual-listbox .slds-dual-listbox__column {
+    border: none !important;
+    background: transparent !important;
+}
+
+.field-description {
+    font-size: 0.875rem;
+    color: #706e6b;
+    margin-top: 4px;
+}
+
+/* Form Buttons */
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 0 20px;
+    align-items: center;
+}
+
+.clear-button,
+.search-button {
+    min-width: 100px;
+    height: 36px;
+}
+
+.clear-button .slds-button,
+.search-button .slds-button {
+    min-width: 100px;
+    height: 36px;
+    padding: 0 16px;
+    font-size: 0.875rem;
+    line-height: 36px;
+}
+
+.clear-button .slds-button_neutral {
+    background-color: #f3f2f2;
+    color: #080707;
+    border: 1px solid #dddbda;
+}
+
+.clear-button .slds-button_neutral:hover {
+    background-color: #e8e6e6;
+}
+
+.search-button .slds-button_brand {
+    background-color: #0070d2;
+    color: #ffffff;
+    border: 1px solid #0070d2;
+}
+
+.search-button .slds-button_brand:hover {
+    background-color: #005fb2;
+}
+
+.search-button .slds-button_brand:disabled {
+    background-color: #c9c7c5;
+    border-color: #c9c7c5;
+    color: #ffffff;
+}
+
+.search-spinner {
+    margin-left: 10px;
+}
+
+/* Results Container */
+.results-container {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #fafaf9;
+    border-radius: 4px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.results-heading {
+    font-size: 1.5em;
+    margin-bottom: 15px;
+}
+
+.results-description {
+    margin-bottom: 15px;
+    color: #706e6b;
+}
+
+.results-count {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.results-count-text {
+    font-size: 0.875rem;
+    color: #706e6b;
+    font-style: italic;
+}
+
+.datatable-wrapper {
+    margin-top: 20px;
+    max-height: 600px;
+    overflow-y: auto;
+    position: relative;
+}
+
+.results-datatable {
+    position: relative;
+}
+
+.results-datatable thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.no-results-message {
+    color: #706e6b;
+    font-style: italic;
+}
+
+/* Exam Candidate Styling */
+.exam-candidate-row {
+    background-color: #fef8e7 !important;
+    font-style: italic;
+}
+
+.exam-candidate-row:hover {
+    background-color: #fdf3d7 !important;
+}
+
+.exam-icon-cell.exam-icon-cell--hidden .slds-button {
+    display: none;
+}
+
+/* Modal Styles */
+.slds-modal {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 9000;
+    opacity: 1;
+    visibility: visible;
+}
+
+.slds-modal__container {
+    position: relative;
+    transform: translate(0, 0);
+    transition: transform 0.1s linear, opacity 0.1s linear;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 2rem;
+    height: 100%;
+    padding: 3rem 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.modal-box {
+    background-color: #ffffff;
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin: auto;
+}
+
+.slds-modal__header {
+    background-color: #fafaf9;
+    border-bottom: 1px solid #dddbda;
+    padding: 1rem 1.5rem;
+    border-radius: 0.25rem 0.25rem 0 0;
+}
+
+.slds-modal__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #080707;
+    margin: 0;
+}
+
+.slds-modal__content {
+    padding: 1.5rem;
+    text-align: center;
+    background-color: #ffffff;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.slds-modal__footer {
+    background-color: #fafaf9;
+    border-top: 1px solid #dddbda;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    border-radius: 0 0 0.25rem 0.25rem;
+}
+
+.slds-backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 8999;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.slds-backdrop_open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.1s linear, visibility 0.1s linear;
+}
+
+.states-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.states-list__state {
+    padding: 8px 15px;
+    background-color: #f4f4f4;
+    border-radius: 4px;
+    font-weight: 500;
+    color: #080707;
+    border: 1px solid #dddbda;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .slb-therapist-search-container {
+        padding: 0;
+    }
+    
+    .page-header {
+        padding: 0 10px;
+    }
+    
+    .search-form-section {
+        padding: 0;
+    }
+    
+    .search-fields-container {
+        padding: 0 10px;
+    }
+    
+    .form-buttons {
+        padding: 0 10px;
+    }
+    
+    .page-header__title-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .page-header__heading {
+        text-align: center;
+    }
+    
+    .participating-states-link {
+        margin-left: 0;
+    }
+    
+    .results-container {
+        margin-left: 10px;
+        margin-right: 10px;
+        padding: 15px;
+    }
+}

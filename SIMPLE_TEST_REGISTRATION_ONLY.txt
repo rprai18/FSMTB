@@ -1,0 +1,62 @@
+// ============================================
+// SIMPLE TEST SCRIPT - Registration Status Only
+// This tests Registration Status without needing Membership__c
+// ============================================
+
+// Create a new Account
+Account testAcc = new Account(
+    Name = 'Test Registration Status - ' + System.now(),
+    RecordTypeId = [SELECT Id FROM RecordType WHERE DeveloperName = 'CE_Provider' AND SobjectType = 'Account' LIMIT 1].Id
+);
+insert testAcc;
+
+System.debug('========================================');
+System.debug('TEST: Registration Status Functionality');
+System.debug('========================================');
+
+// Check default values
+Account result1 = [SELECT Membership_Status__c, Registration_Status__c, Registration_Status_Flag__c,
+                          Survey_Total_Happy__c
+                   FROM Account WHERE Id = :testAcc.Id];
+
+System.debug('✅ Test 1: Default Statuses');
+System.debug('Membership Status: ' + result1.Membership_Status__c); // Should be "Active"
+System.debug('Registration Status: ' + result1.Registration_Status__c); // Should be "Provisional"
+System.debug('Registration Flag: ' + result1.Registration_Status_Flag__c); // Should be false
+System.debug('Survey Total Happy: ' + result1.Survey_Total_Happy__c); // Should be null or 0
+System.debug('Test 1: ' + (result1.Registration_Status__c == 'Provisional' && result1.Registration_Status_Flag__c == false ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('');
+
+// Test: Update Survey_Total_Happy__c to 50 (should become Registered)
+testAcc.Survey_Total_Happy__c = 50;
+update testAcc;
+
+Account result2 = [SELECT Registration_Status__c, Registration_Status_Flag__c, Registration_Status_Date__c 
+                   FROM Account WHERE Id = :testAcc.Id];
+
+System.debug('✅ Test 2: Registration Status = Registered (Survey = 50)');
+System.debug('Registration Status: ' + result2.Registration_Status__c); // Should be "Registered"
+System.debug('Registration Flag: ' + result2.Registration_Status_Flag__c); // Should be true
+System.debug('Registration Date: ' + result2.Registration_Status_Date__c); // Should be today's date
+System.debug('Test 2: ' + (result2.Registration_Status__c == 'Registered' && 
+                           result2.Registration_Status_Flag__c == true && 
+                           result2.Registration_Status_Date__c == System.today() ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('');
+
+// Test: Update Survey_Total_Happy__c to 49 (should become Provisional)
+testAcc.Survey_Total_Happy__c = 49;
+update testAcc;
+
+Account result3 = [SELECT Registration_Status__c, Registration_Status_Flag__c 
+                   FROM Account WHERE Id = :testAcc.Id];
+
+System.debug('✅ Test 3: Registration Status = Provisional (Survey = 49)');
+System.debug('Registration Status: ' + result3.Registration_Status__c); // Should be "Provisional"
+System.debug('Registration Flag: ' + result3.Registration_Status_Flag__c); // Should be false
+System.debug('Test 3: ' + (result3.Registration_Status__c == 'Provisional' && result3.Registration_Status_Flag__c == false ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('');
+
+System.debug('========================================');
+System.debug('REGISTRATION STATUS TESTS COMPLETED');
+System.debug('========================================');
+

@@ -1,0 +1,127 @@
+/* Import portal styles - using content-wrap from global.css */
+.new-course-container {
+    font-family: Montserrat, sans-serif;
+    color: #3e3e3e;
+    max-width: 100%;
+}
+
+/* Header Section - matches portal page-header styling */
+.header-section {
+    background-color: #a3c0e1;
+    margin-bottom: 2em;
+    padding: 3em 1em;
+    position: relative;
+    overflow: hidden;
+}
+
+.header-section__image {
+    position: absolute;
+    bottom: 0;
+    height: 100%;
+    right: 0;
+    top: 0;
+    opacity: 0.5;
+    display: block;
+    z-index: 0;
+}
+
+@media screen and (min-width: 40em) {
+    .header-section {
+        padding: 3em 1em;
+        overflow: hidden;
+    }
+    
+    .header-section__image {
+        left: 50%;
+        right: auto;
+        height: 100%;
+        width: auto;
+    }
+}
+
+.page-title {
+    font-size: 2.25em;
+    font-weight: 700;
+    color: #3e3e3c;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    padding: 0;
+    display: block;
+}
+
+@media screen and (min-width: 64em) {
+    .page-title {
+        max-width: 60%;
+    }
+}
+
+/* Content Section */
+.content-section {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 4px;
+}
+
+.content-section p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.content-section a {
+    color: #1976d2;
+    text-decoration: none;
+}
+
+.content-section a:hover {
+    text-decoration: underline;
+}
+
+/* Form Section */
+.form-section {
+    margin: 2rem 0;
+}
+
+.form-section .slds-box {
+    padding: 1.5rem;
+    background-color: #fff;
+    border: 1px solid #d8dde6;
+    border-radius: 4px;
+}
+
+.form-section .slds-form-element {
+    margin-bottom: 1rem;
+}
+
+.fee-notice {
+    padding: 1rem;
+    background-color: #f3f2f2;
+    border-left: 4px solid #1976d2;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+}
+
+.button-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Error styling */
+.slds-text-color_error {
+    color: #c23934;
+}
+
+.slds-form-element__help {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+/* Loading spinner center */
+lightning-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}

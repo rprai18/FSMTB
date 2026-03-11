@@ -1,0 +1,75 @@
+<template>
+    <!-- Header Section -->
+    <header class="page-header">
+        <div class="page-header__content-wrap content-wrap">
+            <!-- <img src={headerImageUrl} alt="Leg Massage Image" class="page-header__image" 
+                 onerror={handleImageError} /> -->
+            <h1 class="page-header__heading">{pageTitle}</h1>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="content-wrap align-center forgot-username-container">
+        <p class="title-text">
+            Please enter the email that is linked to your CE Registry account. You will be contacted at this email address with further instructions.
+        </p>
+
+        <!-- Error Message Display -->
+        <template if:true={errorMessage}>
+            <div class="error-message">
+                <lightning-icon icon-name="utility:error" size="small" class="error-icon"></lightning-icon>
+                <span>{errorMessage}</span>
+            </div>
+        </template>
+
+        <!-- Forgot Username Form -->
+        <form onsubmit={handleSubmit} class="login-form align-center">
+            <div class="form-grid">
+                <label for="email" class="form-label">
+                    {siteInfo.emailLabel}
+                </label>
+                <div class="form-input-wrapper">
+                    <span class="required-indicator">*</span>
+                    <lightning-input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={email}
+                        onchange={handleEmailChange}
+                        placeholder={siteInfo.emailLabel}
+                        variant="label-hidden"
+                        required
+                        class="form-input">
+                    </lightning-input>
+                </div>
+
+                <div class="form-label"></div>
+                <lightning-button
+                    type="submit"
+                    label="Submit"
+                    variant="brand"
+                    disabled={isLoading}
+                    class="submit-button">
+                </lightning-button>
+            </div>
+        </form>
+
+        <!-- Email Confirmation Popup -->
+        <template if:true={showEmailConfirmation}>
+            <div class="popup__wrapper">
+                <div class="custPopup popup__body">
+                    <div class="align-center">
+                        <div class="custPopup__message">An email has been sent to {email}.</div>
+                        <lightning-button
+                            label="Return To Login"
+                            variant="brand"
+                            onclick={navigateToLogin}
+                            class="button">
+                        </lightning-button>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</template>
+

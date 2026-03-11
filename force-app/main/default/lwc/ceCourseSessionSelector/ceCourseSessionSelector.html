@@ -1,0 +1,98 @@
+<template>
+    <!-- Header Content -->
+    <div class="header-content" lwc:dom="manual"></div>
+
+    <!-- Upload Message -->
+    <div class="message-content" lwc:dom="manual"></div>
+
+    <!-- Selection Panel -->
+    <template if:true={showSelectionPanel}>
+        <lightning-card title="Select Course and Session">
+            <div class="slds-p-around_medium">
+                <lightning-combobox
+                    name="course"
+                    label="Course"
+                    placeholder="Select a course"
+                    options={courseOptions}
+                    value={selectedCourseId}
+                    onchange={handleCourseChange}>
+                </lightning-combobox>
+
+                <template if:true={showSessionsPicklist}>
+                    <lightning-combobox
+                        name="session"
+                        label="Session"
+                        placeholder="Select a session"
+                        options={sessionOptions}
+                        value={selectedSessionId}
+                        onchange={handleSessionChange}>
+                    </lightning-combobox>
+                </template>
+
+                <div class="slds-m-top_medium">
+                    <lightning-button
+                        label="Continue"
+                        variant="brand"
+                        onclick={continueToFileUpload}
+                        disabled={disableContinueButton}>
+                    </lightning-button>
+                </div>
+            </div>
+        </lightning-card>
+    </template>
+
+    <!-- File Upload Panel -->
+    <template if:true={showFileUploadPanel}>
+        <lightning-card title="Upload Roster">
+            <div class="slds-p-around_medium">
+                <p lwc:dom="manual" class="select-file-content"></p>
+                <lightning-input
+                    type="file"
+                    label="Select CSV file"
+                    onchange={handleFileChange}>
+                </lightning-input>
+
+                <div class="slds-m-top_medium">
+                    <lightning-button
+                        label="Upload"
+                        variant="brand"
+                        onclick={uploadRosterFile}>
+                    </lightning-button>
+
+                    <lightning-button
+                        label="Back"
+                        variant="neutral"
+                        onclick={goBackToSelectionPanel}>
+                    </lightning-button>
+                </div>
+            </div>
+        </lightning-card>
+    </template>
+
+    <!-- Success Panel -->
+    <template if:true={showUploadSuccessPanel}>
+        <lightning-card title="Success">
+            <div class="slds-p-around_medium">
+                <p lwc:dom="manual" class="success-content"></p>
+                <lightning-button
+                    label="Back to Roster"
+                    variant="brand"
+                    onclick={hideSuccessPanel}>
+                </lightning-button>
+            </div>
+        </lightning-card>
+    </template>
+
+    <!-- Roster Table -->
+    <template if:true={rosterTableData}>
+        <lightning-card title="Existing Rosters">
+            <div class="slds-p-around_medium">
+                <lightning-datatable
+                    key-field="UploadDate"
+                    data={rosterTableData}
+                    columns={columns}>
+                </lightning-datatable>
+            </div>
+        </lightning-card>
+    </template>
+</template>

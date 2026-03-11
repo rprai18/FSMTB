@@ -1,0 +1,423 @@
+<template>
+    <div class="course-management-container content-wrap">
+        <!-- Loading State -->
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+
+        <!-- Error State -->
+        <template if:true={error}>
+            <div class="slds-m-around_medium">
+                <lightning-icon icon-name="utility:error" size="small" class="slds-m-right_x-small"></lightning-icon>
+                <span>{error}</span>
+            </div>
+        </template>
+
+        <!-- Main Content -->
+        <template if:false={isLoading}>
+            <!-- Action Banner Component -->
+            <template if:true={accountId}>
+                <c-ce-action-banner 
+                    record-id={accountId}
+                    status-field-api-name="Current_Active_Action_Status__c">
+                </c-ce-action-banner>
+            </template>
+
+            <!-- Action Items Section -->
+            <div class="action-items-section">
+                <div class="action-items-left">
+                    <lightning-button
+                        label="ADD NEW COURSE"
+                        variant="brand"
+                        onclick={handleAddNewCourse}
+                        class="add-course-btn">
+                    </lightning-button>
+                    <div class="fee-notice">
+                        A fee of {courseFeeFormatted} will apply to each course submitted.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Published Courses Section -->
+            <div class="courses-section">
+                <div class="section-header">
+                    <h2>Published Courses</h2>
+                </div>
+                <div class="table-wrapper">
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <template if:true={showNoSessionWarning}>
+                                <th scope="col" class="warning-icon-col">
+                                    <div class="slds-truncate" title="Warning"></div>
+                                </th>
+                            </template>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Actions">Actions</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Course Name">Course Name</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Status">Status</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="System-Assigned Course ID">System-Assigned Course ID</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Active Sessions">Active Sessions</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Completed Sessions">Completed Sessions</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template if:true={hasPublishedCourses}>
+                            <template for:each={publishedCourses} for:item="course">
+                                <tr key={course.id} class="slds-hint-parent">
+                                    <template if:true={showNoSessionWarning}>
+                                        <td data-label="Warning" class="warning-icon-col">
+                                            <template if:false={course.activeSessions}>
+                                                <lightning-icon 
+                                                    icon-name="utility:error"
+                                                    size="small"
+                                                    variant="error"
+                                                    title="No active sessions"
+                                                    alternative-text="Warning">
+                                                </lightning-icon>
+                                            </template>
+                                            <template if:true={course.activeSessions}>
+                                                <div></div>
+                                            </template>
+                                        </td>
+                                    </template>
+                                    <td data-label="Actions">
+                                        <div class="slds-truncate">
+                                            <template if:true={course.isPublishedOrUnderReview}>
+                                                <a role="button"
+                                                   tabindex="0"
+                                                   data-action="Edit" 
+                                                   data-id={course.id}
+                                                   onclick={handlePublishedCourseAction}
+                                                   onkeydown={handlePublishedCourseAction}
+                                                   class="action-link">Edit</a>
+                                                <span>&nbsp;|&nbsp;</span>
+                                            </template>
+                                            <a role="button"
+                                               tabindex="0"
+                                               data-action="Copy" 
+                                               data-id={course.id}
+                                               onclick={handlePublishedCourseAction}
+                                               onkeydown={handlePublishedCourseAction}
+                                               class="action-link">Copy</a>
+                                            <template if:true={course.isPublishedOrPending}>
+                                                <span>&nbsp;|&nbsp;</span>
+                                                <a role="button"
+                                                   tabindex="0"
+                                                   data-action="Inactivate" 
+                                                   data-id={course.id}
+                                                   onclick={handlePublishedCourseAction}
+                                                   onkeydown={handlePublishedCourseAction}
+                                                   class="action-link">Inactivate</a>
+                                            </template>
+                                        </div>
+                                    </td>
+                                    <td data-label="Course Name">
+                                        <div class="slds-truncate" title={course.courseName}>{course.courseName}</div>
+                                    </td>
+                                    <td data-label="Status">
+                                        <div class="slds-truncate" title={course.status}>{course.status}</div>
+                                    </td>
+                                    <td data-label="System-Assigned Course ID">
+                                        <div class="slds-truncate" title={course.courseId}>{course.courseId}</div>
+                                    </td>
+                                    <td data-label="Active Sessions">
+                                        <div class="slds-truncate" title={course.activeSessions}>{course.activeSessions}</div>
+                                    </td>
+                                    <td data-label="Completed Sessions">
+                                        <div class="slds-truncate" title={course.completedSessions}>{course.completedSessions}</div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </template>
+                        <template if:false={hasPublishedCourses}>
+                            <tr>
+                                <td colspan={publishedCoursesColspan} class="empty-state-cell" style="text-align: center; padding: 2rem;">
+                                    No published courses found.
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+
+            <!-- Draft Courses Section -->
+            <div class="courses-section">
+                <div class="section-header">
+                    <h2>Draft Courses</h2>
+                </div>
+                <div class="table-wrapper">
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th scope="col">
+                                <div class="slds-truncate" title="Actions">Actions</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Course Name">Course Name</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="System-Assigned Course ID">System-Assigned Course ID</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Total Sessions">Total Sessions</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template if:true={hasDraftCourses}>
+                            <template for:each={draftCourses} for:item="course">
+                                <tr key={course.id} class="slds-hint-parent">
+                                    <td data-label="Actions">
+                                        <div class="slds-truncate">
+                                            <a role="button"
+                                               tabindex="0"
+                                               data-action="Edit" 
+                                               data-id={course.id}
+                                               onclick={handleDraftCourseAction}
+                                               onkeydown={handleDraftCourseAction}
+                                               class="action-link">Edit</a> | 
+                                            <a role="button"
+                                               tabindex="0"
+                                               data-action="Copy" 
+                                               data-id={course.id}
+                                               onclick={handleDraftCourseAction}
+                                               onkeydown={handleDraftCourseAction}
+                                               class="action-link">Copy</a> | 
+                                            <a role="button"
+                                               tabindex="0"
+                                               data-action="Delete" 
+                                               data-id={course.id}
+                                               onclick={handleDraftCourseAction}
+                                               onkeydown={handleDraftCourseAction}
+                                               class="action-link">Delete</a>
+                                        </div>
+                                    </td>
+                                    <td data-label="Course Name">
+                                        <div class="slds-truncate" title={course.courseName}>{course.courseName}</div>
+                                    </td>
+                                    <td data-label="System-Assigned Course ID">
+                                        <div class="slds-truncate" title={course.courseId}>{course.courseId}</div>
+                                    </td>
+                                    <td data-label="Total Sessions">
+                                        <div class="slds-truncate" title={course.totalSessions}>{course.totalSessions}</div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </template>
+                        <template if:false={hasDraftCourses}>
+                            <tr>
+                                <td colspan="4" class="empty-state-cell" style="text-align: center; padding: 2rem;">
+                                    No draft courses found.
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+
+            <!-- Inactive Courses Section -->
+            <div class="courses-section">
+                <div class="section-header">
+                    <h2>Inactive Courses</h2>
+                </div>
+                <div class="table-wrapper">
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th scope="col">
+                                <div class="slds-truncate" title="Actions">Actions</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Course Name">Course Name</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Course Status">Course Status</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="System-Assigned Course ID">System-Assigned Course ID</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="Total Sessions">Total Sessions</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template if:true={hasInactiveCourses}>
+                            <template for:each={inactiveCourses} for:item="course">
+                                <tr key={course.id} class="slds-hint-parent">
+                                    <td data-label="Actions">
+                                        <div class="slds-truncate">
+                                            <template if:true={course.isInactive}>
+                                                <a role="button"
+                                                   tabindex="0"
+                                                   data-action="Activate" 
+                                                   data-id={course.id}
+                                                   onclick={handleInactiveCourseAction}
+                                                   onkeydown={handleInactiveCourseAction}
+                                                   class="action-link">Activate</a>
+                                            </template>
+                                        </div>
+                                    </td>
+                                    <td data-label="Course Name">
+                                        <div class="slds-truncate" title={course.courseName}>{course.courseName}</div>
+                                    </td>
+                                    <td data-label="Course Status">
+                                        <div class="slds-truncate" title={course.status}>{course.status}</div>
+                                    </td>
+                                    <td data-label="System-Assigned Course ID">
+                                        <div class="slds-truncate" title={course.courseId}>{course.courseId}</div>
+                                    </td>
+                                    <td data-label="Total Sessions">
+                                        <div class="slds-truncate" title={course.totalSessions}>{course.totalSessions}</div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </template>
+                        <template if:false={hasInactiveCourses}>
+                            <tr>
+                                <td colspan="5" class="empty-state-cell" style="text-align: center; padding: 2rem;">
+                                    No inactive courses found.
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </template>
+
+        <!-- Delete Confirmation Modal -->
+        <template if:true={showDeleteConfirmation}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small" aria-labelledby="delete-modal-heading" aria-modal="true">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="delete-modal-heading" class="slds-modal__title slds-hyphenate">Confirm Delete</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="delete-modal-content">
+                        <p>Are you sure you want to delete the course?</p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Yes" variant="brand" onclick={deleteConfirmed} class="slds-m-right_x-small"></lightning-button>
+                        <lightning-button label="No" variant="neutral" onclick={closeConfirmations}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- Inactivate Confirmation Modal -->
+        <template if:true={showInactivateConfirmation}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small" aria-labelledby="inactivate-modal-heading" aria-modal="true">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="inactivate-modal-heading" class="slds-modal__title slds-hyphenate">Confirm Inactivate</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="inactivate-modal-content">
+                        <p>Are you sure you want to inactivate the course?</p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Yes" variant="brand" onclick={inactivateConfirmed} class="slds-m-right_x-small"></lightning-button>
+                        <lightning-button label="No" variant="neutral" onclick={closeConfirmations}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- Expiration Notification Modal -->
+        <template if:true={showCourseExpiration}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small" aria-labelledby="expiration-modal-heading" aria-modal="true">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="expiration-modal-heading" class="slds-modal__title slds-hyphenate">Membership Expiration</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="expiration-modal-content">
+                        <p class="popup-message">
+                            Your account is going to expire in {daysUntilExpiration} day(s). Do you wish to renew now?
+                        </p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Renew" variant="brand" onclick={handleRenew} class="slds-m-right_x-small"></lightning-button>
+                        <lightning-button label="Not now" variant="neutral" onclick={closeConfirmations}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- Pending Review Modal -->
+        <template if:true={showCoursePendingReview}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium" aria-labelledby="review-modal-heading" aria-modal="true">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="review-modal-heading" class="slds-modal__title slds-hyphenate">Course Pending Review</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="review-modal-content">
+                        <p class="popup-message">
+                            Your submitted course is pending review by FSMTB. You will be notified via email of any changes to
+                            your course. If your course is approved, its status will update to Published and you must add a
+                            valid session for it to be eligible to display on the FSMTB website.
+                        </p>
+                        <p class="popup-message">
+                            If you have any questions, please contact FSMTB at
+                            <a href="mailto:CE@fsmtb.org" class="email-link">CE@fsmtb.org</a>.
+                        </p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Ok" variant="brand" onclick={closeConfirmations}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- <template if:true={showNewCourseModal}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-labelledby="new-course-modal-heading" aria-modal="true">
+                <div class="slds-modal__container new-course-modal-container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={handleNewCourseClose}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" size="small"></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="new-course-modal-heading" class="slds-modal__title slds-hyphenate">
+                            <template if:true={newCourseCourseId}>
+                                <template if:true={newCourseMethod}>
+                                    Edit Course
+                                </template>
+                                <template if:false={newCourseMethod}>
+                                    Copy Course
+                                </template>
+                            </template>
+                            <template if:false={newCourseCourseId}>
+                                New Course
+                            </template>
+                        </h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium new-course-modal-content" id="new-course-modal-content">
+                        <c-ce-new-course
+                            course-id={newCourseCourseId}
+                            method={newCourseMethod}
+                            onclose={handleNewCourseClose}
+                            onsaved={handleNewCourseSaved}>
+                        </c-ce-new-course>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template> -->
+    </div>
+</template>

@@ -1,0 +1,95 @@
+/* Portal Footer - matches the footer design */
+.portal-footer {
+    width: 100%;
+    background: linear-gradient(to bottom, #528dca 0%, #316ead 100%);
+    padding: 1.5rem 2rem;
+    box-sizing: border-box;
+    margin: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.portal-footer__content {
+    max-width: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.portal-footer__copyright {
+    font-family: 'Schibsted Grotesk', Montserrat, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+}
+
+/* Responsive Design */
+
+/* Tablet (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .portal-footer {
+        padding: 1.25rem 1.5rem;
+    }
+
+    .portal-footer__copyright {
+        font-size: 0.85rem;
+    }
+}
+
+/* Mobile (up to 768px) */
+@media (max-width: 768px) {
+    .portal-footer {
+        padding: 1rem 1.25rem;
+    }
+
+    .portal-footer__copyright {
+        font-size: 0.8rem;
+        text-align: left;
+    }
+}
+
+/* Small Mobile (up to 480px) */
+@media (max-width: 480px) {
+    .portal-footer {
+        padding: 0.875rem 1rem;
+    }
+
+    .portal-footer__copyright {
+        font-size: 0.75rem;
+        line-height: 1.4;
+    }
+}
+
+/* Extra Small Mobile (up to 360px) */
+@media (max-width: 360px) {
+    .portal-footer {
+        padding: 0.75rem 0.875rem;
+    }
+
+    .portal-footer__copyright {
+        font-size: 0.7rem;
+    }
+}
+
+/* Large Desktop (above 1440px) */
+@media (min-width: 1441px) {
+    .portal-footer__content {
+        max-width: 1440px;
+        margin: 0 auto;
+    }
+
+    .portal-footer {
+        padding: 1.75rem 2.5rem;
+    }
+
+    .portal-footer__copyright {
+        font-size: 0.9rem;
+    }
+}
+
