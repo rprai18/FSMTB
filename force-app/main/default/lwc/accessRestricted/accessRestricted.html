@@ -1,0 +1,20 @@
+<template>
+    <!-- Header Section -->
+    <header class="page-header">
+        <div class="page-header__content-wrap content-wrap">
+            <img src={headerImageUrl} alt="Leg Massage Image" class="page-header__image" 
+                 onerror={handleImageError} />
+            <h1 class="page-header__heading">Provider Account Restricted</h1>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="content-wrap access-restricted-container">
+        <p class="restriction-message">
+            Your access is denied while your Provider account is restricted. Contact your program owner or FSMTB at 
+            <a href={emailLink} class="email-link">CE@fsmtb.org</a> 
+            for more information.
+        </p>
+    </div>
+</template>
+

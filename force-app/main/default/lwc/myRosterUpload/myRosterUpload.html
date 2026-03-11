@@ -1,0 +1,723 @@
+<template>
+    <div class="roster-upload-container content-wrap">
+        <!-- Header Section with Title -->
+        <div class="header-section">
+            <!-- <img src={headerImage0} alt="Header" class="header-section__image"/> -->
+            <h1 class="page-title">Roster Uploads</h1>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Instructional Text Section -->
+            <div class="instruction-section">
+                <div class="content" lwc:dom="manual"></div>
+            </div>
+
+            <!-- Upload Button -->
+            <div class="button-section">
+                <lightning-button 
+                    variant="brand" 
+                    label="UPLOAD NEW ROSTER" 
+                    onclick={openSelection}
+                    class="upload-button">
+                </lightning-button>
+            </div>
+
+            <!-- Roster History Table -->
+            <div class="table-section">
+                <lightning-datatable 
+                    key-field="Id" 
+                    data={rosters} 
+                    columns={columns} 
+                    hide-checkbox-column>
+                </lightning-datatable>
+            </div>
+        </div>
+    </div>
+
+    <!-- -------------------------------
+         SELECT COURSE & SESSION MODAL
+    --------------------------------- -->
+    <template if:true={showSelection}>
+        <section role="dialog" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container selection-modal">
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">Select Course & Session</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <div lwc:dom="manual" data-id="uploadMsg"></div>
+                    
+                    <lightning-combobox 
+                        label="Select Course" 
+                        value={courseId} 
+                        options={courseOptions} 
+                        onchange={onCourseChange}>
+                    </lightning-combobox>
+
+                    <template if:true={showSessionPicklist}>
+                        <lightning-combobox 
+                            label="Select Session" 
+                            value={sessionId} 
+                            options={sessionOptions} 
+                            onchange={onSessionChange}>
+                        </lightning-combobox>
+                    </template>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button label="Cancel" onclick={closeSelection}></lightning-button>
+                    <lightning-button 
+                        variant="brand" 
+                        label="Next" 
+                        onclick={continueToFile} 
+                        disabled={disableNext}>
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!-- -------------------------------
+         FILE UPLOAD MODAL (CSV Upload)
+    --------------------------------- -->
+    <template if:true={showFileUpload}>
+        <section role="dialog" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">Roster Upload</h2>
+                </header>
+                
+                <div class="slds-modal__content slds-p-around_medium">
+                    <!-- Course and Session Confirmation -->
+                    <div class="slds-m-bottom_medium">
+                        <p>You are uploading a roster for the course <strong>{courseName}</strong> for session <strong>{sessionName}</strong>. If this is not correct, please go back and select the correct course and session.</p>
+                    </div>
+                    
+                    <!-- Entry Mode Selection -->
+                    <div class="slds-m-bottom_medium entry-mode-selection">
+                        <lightning-button-group>
+                            <lightning-button 
+                                label="Upload CSV File" 
+                                variant={fileButtonVariant}
+                                onclick={handleFileModeClick}>
+                            </lightning-button>
+                            <lightning-button 
+                                label="Enter Manually" 
+                                variant={manualButtonVariant}
+                                onclick={switchToManualEntry}>
+                            </lightning-button>
+                        </lightning-button-group>
+                    </div>
+                    
+                    <!-- File Upload Section -->
+                    <template if:true={showFileUploadSection}>
+                        <!-- File Format Instructions -->
+                        <div class="slds-m-bottom_medium upload-instructions">
+                            <p>
+                                The file you upload must follow the format detailed in the File Explanation. To assist you with creating your roster, we have provided a Roster Assistant (Microsoft Excel required). If you do not have Microsoft Excel, you may use the template below. Providers may use their own file as long as it contains all of the required information (see template) and is in a CSV format.
+                            </p>
+                        </div>
+                        
+                        <!-- Links Section -->
+                        <div class="slds-m-bottom_medium upload-links">
+                            <p>
+                                <a href={fileExplanationUrl} target="_blank" class="file-explanation-link">File Explanation</a> | 
+                                <a href={templateDownloadUrl} download="Roster.csv" class="template-download-link"> Download Template</a>
+                            </p>
+                        </div>
+                        
+                        <!-- File input -->
+                        <div class="slds-m-top_medium">
+                            <lightning-input 
+                                type="file" 
+                                label="Choose File" 
+                                accept=".csv"
+                                onchange={handleFileChange}>
+                            </lightning-input>
+                        </div>
+                        
+                        <!-- Validation Error Messages -->
+                        <template if:true={validationErrors}>
+                            <div class="slds-m-top_medium validation-error-message">
+                                <div class="slds-text-color_error">
+                                    <strong>Validation Errors:</strong>
+                                    <pre class="validation-error-text">{validationErrors}</pre>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+                    
+                    <!-- Manual Entry Table Section -->
+                    <template if:true={showManualEntrySection}>
+                        <div class="manual-entry-container">
+                            <div class="slds-m-bottom_small">
+                                <lightning-button 
+                                    variant="neutral" 
+                                    label="Add Row" 
+                                    icon-name="utility:add"
+                                    onclick={addRow}>
+                                </lightning-button>
+                            </div>
+                            
+                            <!-- Row-Level Validation Summary Message -->
+                            <template if:true={showIncompleteRowsMessage}>
+                                <div class="slds-m-bottom_medium validation-error-message">
+                                    <div class="slds-text-color_error slds-text-body_regular">
+                                        <strong>You have incomplete rows. Please fill out all fields before submitting.</strong>
+                                    </div>
+                                </div>
+                            </template>
+                            
+                            <!-- Validation Error Messages for Manual Entry -->
+                            <template if:true={validationErrors}>
+                                <div class="slds-m-bottom_medium validation-error-message">
+                                    <div class="slds-text-color_error">
+                                        <strong>Validation Errors:</strong>
+                                        <pre class="validation-error-text">{validationErrors}</pre>
+                                    </div>
+                                </div>
+                            </template>
+                            
+                            <div class="manual-entry-table-wrapper">
+                                <table class="manual-entry-table slds-table slds-table_cell-buffer slds-table_bordered">
+                                    <thead>
+                                        <tr class="slds-line-height_reset">
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="First Name">First Name</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Last Name">Last Name</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="State of License #1">State of License #1</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="License Number #1">License Number #1</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="State of License #2">State of License #2</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="License Number #2">License Number #2</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="State of License #3">State of License #3</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="License Number #3">License Number #3</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Email">Email</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" title="Course Completed On">Course Completed On</div>
+                                                <div class="date-header-help">Accepted: MM/DD/YYYY, M/D/YY, M/D/YYYY, Excel serial</div>
+                                            </th>
+                                            <th scope="col" class="action-col">
+                                                <div class="slds-truncate" title="Actions">Actions</div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <template for:each={rosterRows} for:item="row">
+                                            <tr key={row.id} class={row.rowClass}>
+                                                <td data-label="First Name">
+                                                    <lightning-input
+                                                        type="text"
+                                                        value={row.firstName}
+                                                        data-row-id={row.id}
+                                                        data-field="firstName"
+                                                        onchange={handleRowInputChange}
+                                                        onblur={handleRowInputBlur}
+                                                        message-when-value-missing={row.errorFirstName}>
+                                                    </lightning-input>
+                                                    <template if:true={row.errorFirstName}>
+                                                        <div class="slds-text-color_error slds-text-body_small slds-m-top_xx-small">{row.errorFirstName}</div>
+                                                    </template>
+                                                </td>
+                                                <td data-label="Last Name">
+                                                    <lightning-input
+                                                        type="text"
+                                                        value={row.lastName}
+                                                        data-row-id={row.id}
+                                                        data-field="lastName"
+                                                        onchange={handleRowInputChange}
+                                                        onblur={handleRowInputBlur}
+                                                        message-when-value-missing={row.errorLastName}
+                                                        data-error-field="lastName">
+                                                    </lightning-input>
+                                                    <template if:true={row.errorLastName}>
+                                                        <div class="slds-text-color_error slds-text-body_small slds-m-top_xx-small">{row.errorLastName}</div>
+                                                    </template>
+                                                </td>
+                                                <td data-label="State of License #1">
+                                                    <lightning-combobox
+                                                        placeholder="Select"
+                                                        value={row.stateOfLicense1}
+                                                        options={stateOptions}
+                                                        data-row-id={row.id}
+                                                        data-field="stateOfLicense1"
+                                                        onchange={handleRowInputChange}
+                                                        onblur={handleRowInputBlur}
+                                                        message-when-value-missing={row.errorStateOfLicense1}
+                                                        data-error-field="stateOfLicense1">
+                                                    </lightning-combobox>
+                                                    <template if:true={row.errorStateOfLicense1}>
+                                                        <div class="slds-text-color_error slds-text-body_small slds-m-top_xx-small">{row.errorStateOfLicense1}</div>
+                                                    </template>
+                                                </td>
+                                                <td data-label="License Number #1">
+                                                    <lightning-input
+                                                        type="text"
+                                                        value={row.licenseNumber1}
+                                                        data-row-id={row.id}
+                                                        data-field="licenseNumber1"
+                                                        onchange={handleRowInputChange}
+                                                        onblur={handleRowInputBlur}
+                                                        message-when-value-missing={row.errorLicenseNumber1}
+                                                        data-error-field="licenseNumber1">
+                                                    </lightning-input>
+                                                    <template if:true={row.errorLicenseNumber1}>
+                                                        <div class="slds-text-color_error slds-text-body_small slds-m-top_xx-small">{row.errorLicenseNumber1}</div>
+                                                    </template>
+                                                </td>
+                                                <td data-label="State of License #2">
+                                                    <lightning-combobox
+                                                        placeholder="Select"
+                                                        value={row.stateOfLicense2}
+                                                        options={stateOptions}
+                                                        data-row-id={row.id}
+                                                        data-field="stateOfLicense2"
+                                                        onchange={handleRowInputChange}
+                                                        onblur={handleRowInputBlur}
+                                                        message-when-value-missing={row.errorStateOfLicense2}
+                                                        data-error-field="stateOfLicense2">
+                                                    </lightning-combobox>
+                                                    <template if:true={row.errorStateOfLicense2}>
+                                                        <div class="slds-text-color_error slds-text-body_small slds-m-top_xx-small">{row.errorStateOfLicense2}</div>
+                                                    </template>
+                                                </td>
+                                                <td data-label="License Number #2">
+                                                    <lightning-input
+                                                        type="text"
+                                                        value={row.licenseNumber2}
+                                                        data-row-id={row.id}
+                                                        data-field="licenseNumber2"
+                                                        onchange={handleRowInputChange}
+                                                        onblur={handleRowInputBlur}
+                                                        message-when-value-missing={row.errorLicenseNumber2}
+                                                        data-error-field="licenseNumber2">
+                                                    </lightning-input>
+                                                    <template if:true={row.errorLicenseNumber2}>
+                                                        <div class="slds-text-color_error slds-text-body_small slds-m-top_xx-small">{row.errorLicenseNumber2}</div>
+                                                    </template>
+                                                </td>
+                                                <td data-label="State of License #3">
+                                                    <lightning-combobox
+                                                        placeholder="Select"
+                                                        value={row.stateOfLicense3}
+                                                        options={stateOptions}
+                                                        data-row-id={row.id}
+                                                        data-field="stateOfLicense3"
+                                                        onchange={handleRowInputChange}
+                                                        onblur={handleRowInputBlur}
+                                                        message-when-value-missing={row.errorStateOfLicense3}
+                                                        data-error-field="stateOfLicense3">
+                                                    </lightning-combobox>
+                                                    <template if:true={row.errorStateOfLicense3}>
+                                                        <div class="slds-text-color_error slds-text-body_small slds-m-top_xx-small">{row.errorStateOfLicense3}</div>
+                                                    </template>
+                                                </td>
+                                                <td data-label="License Number #3">
+                                                    <lightning-input
+                                                        type="text"
+                                                        value={row.licenseNumber3}
+                                                        data-row-id={row.id}
+                                                        data-field="licenseNumber3"
+                                                        onchange={handleRowInputChange}
+                                                        onblur={handleRowInputBlur}
+                                                        message-when-value-missing={row.errorLicenseNumber3}
+                                                        data-error-field="licenseNumber3">
+                                                    </lightning-input>
+                                                    <template if:true={row.errorLicenseNumber3}>
+                                                        <div class="slds-text-color_error slds-text-body_small slds-m-top_xx-small">{row.errorLicenseNumber3}</div>
+                                                    </template>
+                                                </td>
+                                                <td data-label="Email">
+                                                    <lightning-input
+                                                        type="email"
+                                                        value={row.email}
+                                                        data-row-id={row.id}
+                                                        data-field="email"
+                                                        onchange={handleRowInputChange}
+                                                        onblur={handleRowInputBlur}
+                                                        message-when-value-missing={row.errorEmail}
+                                                        data-error-field="email">
+                                                    </lightning-input>
+                                                    <template if:true={row.errorEmail}>
+                                                        <div class="slds-text-color_error slds-text-body_small slds-m-top_xx-small">{row.errorEmail}</div>
+                                                    </template>
+                                                </td>
+                                                <td data-label="Course Completed On">
+                                                    <lightning-input
+                                                        type="text"
+                                                        value={row.courseCompletedOn}
+                                                        data-row-id={row.id}
+                                                        data-field="courseCompletedOn"
+                                                        onchange={handleRowInputChange}
+                                                        onblur={handleRowInputBlur}
+                                                        placeholder="MM/DD/YYYY"
+                                                        message-when-value-missing={row.errorCourseCompletedOn}
+                                                        data-error-field="courseCompletedOn">
+                                                    </lightning-input>
+                                                    <template if:true={row.errorCourseCompletedOn}>
+                                                        <div class="slds-text-color_error slds-text-body_small slds-m-top_xx-small">{row.errorCourseCompletedOn}</div>
+                                                    </template>
+                                                </td>
+                                                <td data-label="Actions" class="action-col">
+                                                    <lightning-button-icon
+                                                        icon-name="utility:delete"
+                                                        alternative-text="Delete Row"
+                                                        title="Delete Row"
+                                                        data-row-id={row.id}
+                                                        onclick={deleteRow}
+                                                        variant="bare"
+                                                        class="delete-row-button">
+                                                    </lightning-button-icon>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button label="CANCEL" onclick={cancelUpload}></lightning-button>
+                    <lightning-button variant="neutral" label="BACK" onclick={backToSelection}></lightning-button>
+                    <lightning-button 
+                        variant="brand" 
+                        label={uploadLabel} 
+                        onclick={uploadFile} 
+                        disabled={disableUpload}>
+                    </lightning-button>
+                </footer>
+
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    
+    <!-- -------------------------------
+         VERIFICATION MODAL
+    --------------------------------- -->
+    <template if:true={showVerification}>
+        <section role="dialog" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container verification-modal">
+                
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">Verify Roster Data</h2>
+                </header>
+                
+                <div class="slds-modal__content slds-p-around_medium">
+                    <!-- Validation Summary -->
+                    <div class="slds-m-bottom_medium validation-summary">
+                        <div class="slds-grid slds-gutters">
+                            <div class="slds-col slds-size_1-of-4">
+                                <div class="summary-item">
+                                    <div class="summary-label">Total Records</div>
+                                    <div class="summary-value">{validationSummary.totalCount}</div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                                <div class="summary-item">
+                                    <div class="summary-label">Valid</div>
+                                    <div class="summary-value slds-text-color_success">{validationSummary.validCount}</div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                                <div class="summary-item">
+                                    <div class="summary-label">Invalid</div>
+                                    <div class="summary-value slds-text-color_error">{validationSummary.invalidCount}</div>
+                                </div>
+                            </div>
+                            <div class="slds-col slds-size_1-of-4">
+                                <div class="summary-item">
+                                    <div class="summary-label">Status</div>
+                                    <div class="summary-value {validationStatusClass}">
+                                        {validationStatusText}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Verification Table (Editable) -->
+                    <template if:true={hasVerifiedEntries}>
+                        <div class="slds-m-bottom_small">
+                            <lightning-button 
+                                variant="neutral" 
+                                label="Add Row" 
+                                icon-name="utility:add"
+                                onclick={addVerifiedRow}>
+                            </lightning-button>
+                        </div>
+                        
+                        <div class="verification-table-wrapper">
+                            <table class="manual-entry-table slds-table slds-table_cell-buffer slds-table_bordered verification-editable-table">
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th scope="col" style="width: 60px;">
+                                            <div class="slds-truncate" title="Row #">Row #</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="First Name">First Name</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Last Name">Last Name</div>
+                                        </th>
+                                        <th scope="col" style="width: 100px;">
+                                            <div class="slds-truncate" title="State #1">State #1</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="License #1">License #1</div>
+                                        </th>
+                                        <th scope="col" style="width: 100px;">
+                                            <div class="slds-truncate" title="State #2">State #2</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="License #2">License #2</div>
+                                        </th>
+                                        <th scope="col" style="width: 100px;">
+                                            <div class="slds-truncate" title="State #3">State #3</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="License #3">License #3</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Email">Email</div>
+                                        </th>
+                                        <th scope="col">
+                                            <div class="slds-truncate" title="Course Completed On">Course Completed On</div>
+                                            <div class="date-header-help">Accepted: MM/DD/YYYY, M/D/YY, M/D/YYYY, Excel serial</div>
+                                        </th>
+                                        <th scope="col" style="width: 100px;">
+                                            <div class="slds-truncate" title="Status">Status</div>
+                                        </th>
+                                        <th scope="col" style="width: 80px;" class="action-col">
+                                            <div class="slds-truncate" title="Actions">Actions</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={verifiedEntries} for:item="entry">
+                                        <tr key={entry.rowNumber} class="slds-hint-parent {entry.rowClass}">
+                                            <td data-label="Row #" style="text-align: center;">
+                                                {entry.rowNumber}
+                                            </td>
+                                            <td data-label="First Name">
+                                                <lightning-input
+                                                    type="text"
+                                                    value={entry.firstName}
+                                                    data-row-number={entry.rowNumber}
+                                                    data-field="firstName"
+                                                    onchange={handleVerifiedEntryChange}>
+                                                </lightning-input>
+                                            </td>
+                                            <td data-label="Last Name">
+                                                <lightning-input
+                                                    type="text"
+                                                    value={entry.lastName}
+                                                    data-row-number={entry.rowNumber}
+                                                    data-field="lastName"
+                                                    onchange={handleVerifiedEntryChange}>
+                                                </lightning-input>
+                                            </td>
+                                            <td data-label="State #1">
+                                                <lightning-combobox
+                                                    placeholder="Select"
+                                                    value={entry.stateOfLicense1}
+                                                    options={stateOptions}
+                                                    data-row-number={entry.rowNumber}
+                                                    data-field="stateOfLicense1"
+                                                    onchange={handleVerifiedEntryChange}>
+                                                </lightning-combobox>
+                                            </td>
+                                            <td data-label="License #1">
+                                                <lightning-input
+                                                    type="text"
+                                                    value={entry.licenseNumber1}
+                                                    data-row-number={entry.rowNumber}
+                                                    data-field="licenseNumber1"
+                                                    onchange={handleVerifiedEntryChange}>
+                                                </lightning-input>
+                                            </td>
+                                            <td data-label="State #2">
+                                                <lightning-combobox
+                                                    placeholder="Select"
+                                                    value={entry.stateOfLicense2}
+                                                    options={stateOptions}
+                                                    data-row-number={entry.rowNumber}
+                                                    data-field="stateOfLicense2"
+                                                    onchange={handleVerifiedEntryChange}>
+                                                </lightning-combobox>
+                                            </td>
+                                            <td data-label="License #2">
+                                                <lightning-input
+                                                    type="text"
+                                                    value={entry.licenseNumber2}
+                                                    data-row-number={entry.rowNumber}
+                                                    data-field="licenseNumber2"
+                                                    onchange={handleVerifiedEntryChange}>
+                                                </lightning-input>
+                                            </td>
+                                            <td data-label="State #3">
+                                                <lightning-combobox
+                                                    placeholder="Select"
+                                                    value={entry.stateOfLicense3}
+                                                    options={stateOptions}
+                                                    data-row-number={entry.rowNumber}
+                                                    data-field="stateOfLicense3"
+                                                    onchange={handleVerifiedEntryChange}>
+                                                </lightning-combobox>
+                                            </td>
+                                            <td data-label="License #3">
+                                                <lightning-input
+                                                    type="text"
+                                                    value={entry.licenseNumber3}
+                                                    data-row-number={entry.rowNumber}
+                                                    data-field="licenseNumber3"
+                                                    onchange={handleVerifiedEntryChange}>
+                                                </lightning-input>
+                                            </td>
+                                            <td data-label="Email">
+                                                <lightning-input
+                                                    type="email"
+                                                    value={entry.email}
+                                                    data-row-number={entry.rowNumber}
+                                                    data-field="email"
+                                                    onchange={handleVerifiedEntryChange}>
+                                                </lightning-input>
+                                            </td>
+                                            <td data-label="Course Completed On">
+                                                <lightning-input
+                                                    type="text"
+                                                    value={entry.courseCompletedOn}
+                                                    data-row-number={entry.rowNumber}
+                                                    data-field="courseCompletedOn"
+                                                    onchange={handleVerifiedEntryChange}
+                                                    placeholder="MM/DD/YYYY"
+                                                    pattern="\d{2}/\d{2}/\d{4}">
+                                                </lightning-input>
+                                            </td>
+                                            <td data-label="Status" style="text-align: center;">
+                                                <span class={entry.statusBadgeClass}>{entry.status}</span>
+                                            </td>
+                                            <td data-label="Actions" class="action-col" style="text-align: center;">
+                                                <lightning-button-icon
+                                                    icon-name="utility:delete"
+                                                    alternative-text="Delete Row"
+                                                    title="Delete Row"
+                                                    data-row-number={entry.rowNumber}
+                                                    onclick={deleteVerifiedRow}
+                                                    variant="bare"
+                                                    class="delete-row-button">
+                                                </lightning-button-icon>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </template>
+                    <template if:false={hasVerifiedEntries}>
+                        <div class="slds-m-top_medium">
+                            <p class="slds-text-body_small slds-text-color_weak">No data to display.</p>
+                        </div>
+                    </template>
+
+                    <div class="slds-m-top_medium">
+                        <p class="slds-text-body_small">
+                            <strong>Note:</strong> Please review the data above. Invalid rows are highlighted in red. 
+                            You can go back to edit the data or confirm to submit.
+                        </p>
+                    </div>
+                </div>
+
+                <footer class="slds-modal__footer">
+                    <lightning-button label="BACK" onclick={backToFileUpload}></lightning-button>
+                    <lightning-button 
+                        variant="brand" 
+                        label="CONFIRM & SUBMIT" 
+                        onclick={confirmSubmission} 
+                        disabled={canConfirmSubmission}>
+                    </lightning-button>
+                </footer>
+
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    
+    <!-- -------------------------------
+         SUCCESS MODAL (After Upload)
+    --------------------------------- -->
+    <template if:true={showSuccess}>
+        <section role="dialog" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container success-modal-container">
+                <header class="slds-modal__header">
+                    <h2 class="slds-text-heading_medium">Roster Upload Successful</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <p class="slds-text-body_regular slds-m-bottom_medium">
+                        Thank you, your roster has been submitted.
+                    </p>
+                    
+                    <!-- Uploaded Roster Data Table -->
+                    <template if:true={showSuccessTable}>
+                        <div class="slds-m-top_medium">
+                            <h3 class="slds-text-heading_small slds-m-bottom_small">Uploaded Roster Data ({uploadedRosterEntries.length} records)</h3>
+                            <div class="uploaded-roster-table-wrapper">
+                                <lightning-datatable
+                                    key-field="rowNumber"
+                                    data={uploadedRosterEntries}
+                                    columns={uploadedRosterColumns}
+                                    hide-checkbox-column
+                                    show-row-number-column="false">
+                                </lightning-datatable>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="brand" label="OK" onclick={closeSuccess}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+    
+    <!-- -------------------------------
+         ERROR MODAL (Failed Upload)
+    --------------------------------- -->
+    <template if:true={showError}>
+        <section role="dialog" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header slds-theme_error">
+                    <h2 class="slds-text-heading_medium">Upload Failed</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium">
+                    <p class="slds-text-heading_small">{errorMessage}</p>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button variant="brand" label="OK" onclick={closeError}></lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

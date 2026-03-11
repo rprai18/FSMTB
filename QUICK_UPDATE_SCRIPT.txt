@@ -1,0 +1,65 @@
+// ============================================
+// QUICK UPDATE SCRIPT - Populate Statuses on Existing Accounts
+// ============================================
+
+System.debug('========================================');
+System.debug('QUICK UPDATE - Populating Statuses');
+System.debug('========================================');
+
+// Update a few accounts to test
+List<Account> testAccounts = [
+    SELECT Id, Name 
+    FROM Account 
+    WHERE RecordType.DeveloperName = 'CE_Provider'
+    AND (Membership_Status__c = null OR Registration_Status__c = null)
+    LIMIT 5
+];
+
+System.debug('Found ' + testAccounts.size() + ' accounts to update');
+System.debug('');
+
+List<Account> toUpdate = new List<Account>();
+for (Account acc : testAccounts) {
+    System.debug('Updating: ' + acc.Name);
+    toUpdate.add(new Account(Id = acc.Id));
+}
+
+if (!toUpdate.isEmpty()) {
+    update toUpdate;
+    System.debug('✅ Update completed! Checking results...');
+    System.debug('');
+    
+    // Check results
+    List<Account> results = [
+        SELECT Name, Membership_Status__c, Registration_Status__c,
+               Registration_Status_Flag__c, Survey_Total_Happy__c
+        FROM Account 
+        WHERE Id IN :toUpdate
+    ];
+    
+    for (Account acc : results) {
+        System.debug('Account: ' + acc.Name);
+        System.debug('  Membership Status: ' + acc.Membership_Status__c);
+        System.debug('  Registration Status: ' + acc.Registration_Status__c);
+        System.debug('  Registration Flag: ' + acc.Registration_Status_Flag__c);
+        System.debug('  Survey Total Happy: ' + acc.Survey_Total_Happy__c);
+        
+        if (acc.Registration_Status__c == null) {
+            System.debug('  ❌ Registration Status is still null!');
+        } else {
+            System.debug('  ✅ Registration Status populated!');
+        }
+        
+        if (acc.Membership_Status__c == null) {
+            System.debug('  ❌ Membership Status is still null!');
+        } else {
+            System.debug('  ✅ Membership Status populated!');
+        }
+        System.debug('');
+    }
+}
+
+System.debug('========================================');
+System.debug('UPDATE COMPLETED');
+System.debug('========================================');
+

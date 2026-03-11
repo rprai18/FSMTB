@@ -1,0 +1,36 @@
+<template>
+    <template if:true={showBanner}>
+        <div class={bannerClass} role="status" aria-live="polite">
+            <div class="banner__inner">
+
+                <!-- ICON BLOCK - now with FIXED WIDTH for visibility -->
+                <div class="banner__icon-group">
+                    <template if:true={showFlagIcon}>
+                        <lightning-icon 
+                            icon-name="utility:priority"
+                            size="small"
+                            variant="inverse"
+                            class="icon-fix"
+                            alternative-text="flag">
+                        </lightning-icon>
+                    </template>
+
+                    <template if:true={showEyeIcon}>
+                        <lightning-icon 
+                            icon-name="utility:preview"
+                            size="small"
+                            variant="inverse"
+                            class="icon-fix"
+                            alternative-text="under review">
+                        </lightning-icon>
+                    </template>
+                </div>
+
+                <div class="banner__text">
+                    {bannerMessage}
+                </div>
+
+            </div>
+        </div>
+    </template>
+</template>

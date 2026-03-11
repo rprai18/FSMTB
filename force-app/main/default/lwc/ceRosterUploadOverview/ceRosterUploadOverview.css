@@ -1,0 +1,94 @@
+:host {
+    display: block;
+    background-color: #f4f6f9;
+    min-height: 100vh;
+    font-family: 'Salesforce Sans', Arial, sans-serif;
+}
+
+/* Header bar */
+.page-header {
+    background-color: rgba(54, 110, 171);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.favicon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+}
+
+.title {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+/* Right side user info */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.logout-link {
+    color: #fff;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.logout-link:hover {
+    text-decoration: none;
+}
+
+/* Navigation bar below header */
+.nav-tabs {
+    display: flex;
+    justify-content: flex-start;
+    background-color: #f0f4f8;
+    border-bottom: 1px solid #d8dde6;
+    padding: 0.5rem 2rem;
+    gap: 1.5rem;
+}
+
+.tab {
+    color: #2b3e50;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.25rem 0;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.3s, color 0.3s;
+}
+
+.tab:hover {
+    color: rgba(54, 110, 171);
+}
+
+.tab.active {
+    color: rgba(54, 110, 171);
+    border-bottom: 3px solid rgba(54, 110, 171);
+}
+
+/* Content container */
+.content-area {
+    background-color: #fff;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin: 2rem auto;
+    width: 90%;
+}
+.tab.active {
+    color: rgba(54, 110, 171);
+    border-bottom: 3px solid rgba(54, 110, 171);
+}

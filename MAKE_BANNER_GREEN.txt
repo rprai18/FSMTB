@@ -1,0 +1,113 @@
+// ============================================
+// MAKE BANNER GREEN - Check Current Status & Fix
+// ============================================
+
+System.debug('========================================');
+System.debug('MAKING BANNER GREEN');
+System.debug('========================================');
+System.debug('');
+
+// Step 1: Check current account statuses
+System.debug('STEP 1: Check Current Account Statuses');
+System.debug('----------------------------------------');
+
+// Get the current user's account
+Id userId = UserInfo.getUserId();
+User currentUser = [SELECT AccountId FROM User WHERE Id = :userId LIMIT 1];
+
+if (currentUser.AccountId == null) {
+    System.debug('❌ No account found for current user');
+} else {
+    Account acc = [
+        SELECT Id, Name, 
+               Registration_Status__c, 
+               Current_Active_Action_Status__c
+        FROM Account 
+        WHERE Id = :currentUser.AccountId
+        LIMIT 1
+    ];
+    
+    System.debug('Account: ' + acc.Name);
+    System.debug('Account ID: ' + acc.Id);
+    System.debug('Registration Status: ' + acc.Registration_Status__c);
+    System.debug('Action Status: ' + acc.Current_Active_Action_Status__c);
+    System.debug('');
+    
+    // Step 2: Determine what banner color will show
+    System.debug('STEP 2: Current Banner Color');
+    System.debug('----------------------------------------');
+    
+    if (acc.Current_Active_Action_Status__c != null) {
+        System.debug('❌ Banner is ORANGE (Action Status exists)');
+        System.debug('   Action Status: ' + acc.Current_Active_Action_Status__c);
+        System.debug('');
+        System.debug('To make banner GREEN:');
+        System.debug('   1. Clear the Action Status (set to null)');
+        System.debug('   2. Ensure Registration Status = "Provisional"');
+        System.debug('');
+        
+        // Step 3: Make it green - Clear Action Status
+        System.debug('STEP 3: Making Banner Green');
+        System.debug('----------------------------------------');
+        System.debug('Clearing Action Status...');
+        
+        Account accUpdate = new Account(Id = acc.Id);
+        accUpdate.Current_Active_Action_Status__c = null;
+        
+        try {
+            update accUpdate;
+            System.debug('✅ Action Status cleared!');
+            System.debug('');
+            System.debug('Banner should now be GREEN if Registration Status = "Provisional"');
+        } catch (Exception e) {
+            System.debug('❌ Error clearing Action Status: ' + e.getMessage());
+        }
+    } else if (acc.Registration_Status__c == 'Provisional') {
+        System.debug('✅ Banner is GREEN (Registration Status = "Provisional")');
+        System.debug('   Registration Status: ' + acc.Registration_Status__c);
+        System.debug('');
+        System.debug('If banner is still not green:');
+        System.debug('   1. Refresh the page');
+        System.debug('   2. Check if code changes are deployed');
+        System.debug('   3. Check browser console for errors');
+    } else {
+        System.debug('⚠️  Banner will NOT show (no status conditions met)');
+        System.debug('   Registration Status: ' + acc.Registration_Status__c);
+        System.debug('   Action Status: ' + acc.Current_Active_Action_Status__c);
+        System.debug('');
+        System.debug('To make banner GREEN:');
+        System.debug('   1. Set Registration Status = "Provisional"');
+        System.debug('   2. Ensure Action Status = null');
+        
+        // Set Registration Status to Provisional for testing
+        System.debug('');
+        System.debug('Setting Registration Status to "Provisional" for testing...');
+        Account accUpdate = new Account(Id = acc.Id);
+        accUpdate.Registration_Status__c = 'Provisional';
+        
+        try {
+            update accUpdate;
+            System.debug('✅ Registration Status set to "Provisional"!');
+            System.debug('');
+            System.debug('Banner should now be GREEN!');
+        } catch (Exception e) {
+            System.debug('❌ Error setting Registration Status: ' + e.getMessage());
+        }
+    }
+}
+
+System.debug('');
+System.debug('========================================');
+System.debug('SCRIPT COMPLETED');
+System.debug('========================================');
+System.debug('');
+System.debug('SUMMARY:');
+System.debug('- Banner shows GREEN when: Registration Status = "Provisional" AND Action Status = null');
+System.debug('- Banner shows ORANGE when: Action Status has value (Under Review, Restricted, etc.)');
+System.debug('- Banner hides when: Neither status condition is met');
+System.debug('');
+System.debug('To make banner GREEN:');
+System.debug('1. Ensure Registration_Status__c = "Provisional"');
+System.debug('2. Clear Current_Active_Action_Status__c (set to null)');
+System.debug('3. Refresh the page');
+

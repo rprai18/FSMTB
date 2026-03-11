@@ -1,0 +1,312 @@
+<template>
+    <div class="therapist-report-container">
+        <!-- Loading State -->
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+
+        <!-- Error State -->
+        <template if:true={error}>
+            <div class="slds-m-around_medium">
+                <lightning-icon icon-name="utility:error" size="small" class="slds-m-right_x-small"></lightning-icon>
+                <span>{error}</span>
+            </div>
+        </template>
+
+        <!-- Main Content -->
+        <template if:false={isLoading}>
+            <template if:false={error}>
+                <!-- Header Section -->
+                <header class="page-header">
+                    <div class="content-wrap">
+                        <h1 class="page-header__heading">Therapist Report</h1>
+                    </div>
+                </header>
+
+                <div class="content-wrap" if:true={contact}>
+                    <!-- Therapist Header -->
+                    <div class="therapist-report__header-content">
+                        <!-- <img src="" class="therapist-report__image" alt="therapist image" /> -->
+                        <h2 class="therapist-report__name">{therapistFullName}</h2>
+                    </div>
+
+                    <div class="therapist-report__results">
+                        <!-- Identifying Information -->
+                        <div class="results-pod info-pod">
+                            <div class="results-pod__heading">Identifying Information</div>
+                            <div class="results-pod__content info-pod__content">
+                                <div class="info-grid">
+                                    <div class="info-pod__item">
+                                        <div class="info-pod__item-label">First Name</div>
+                                        <div class="info-pod__item-content">{contact.firstName}</div>
+                                    </div>
+                                    <div class="info-pod__item">
+                                        <div class="info-pod__item-label">Middle Name</div>
+                                        <div class="info-pod__item-content">{contact.middleName}</div>
+                                    </div>
+                                    <div class="info-pod__item">
+                                        <div class="info-pod__item-label">Last Name</div>
+                                        <div class="info-pod__item-content">{contact.lastName}</div>
+                                    </div>
+                                    <div class="info-pod__item">
+                                        <div class="info-pod__item-label">Also Known As</div>
+                                        <div class="info-pod__item-content">{contact.previouslyKnownAs}</div>
+                                    </div>
+                                    <div class="info-pod__item">
+                                        <div class="info-pod__item-label">Suffix</div>
+                                        <div class="info-pod__item-content">{contact.suffix}</div>
+                                    </div>
+                                    <div class="info-pod__item">
+                                        <div class="info-pod__item-label">SSN (Last 4 Digits)</div>
+                                        <div class="info-pod__item-content">{contact.ssnLast4}</div>
+                                    </div>
+                                    <div class="info-pod__item">
+                                        <div class="info-pod__item-label">Birthdate</div>
+                                        <div class="info-pod__item-content">{contact.formattedBirthdate}</div>
+                                    </div>
+                                    <div class="info-pod__item">
+                                        <div class="info-pod__item-label">Date Of Death</div>
+                                        <div class="info-pod__item-content">{contact.formattedDateOfDeath}</div>
+                                    </div>
+                                    <div class="info-pod__item">
+                                        <div class="info-pod__item-label">Exam Results Adjusted?</div>
+                                        <template if:false={contact.examResultAdjusted}>
+                                            <div class="info-pod__item-content">No</div>
+                                        </template>
+                                        <template if:true={contact.examResultAdjusted}>
+                                            <div class="info-pod__item-content">Yes</div>
+                                            <div class="info-pod__item-description">
+                                                Please contact FSMTB for more information about this results adjustment at
+                                                <a href="mailto:mtld@fsmtb.org?subject=Result adjustment information request for {contact.Name}">mtld@fsmtb.org</a>.
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="results-pod">
+                            <div class="results-pod__heading">Contact Information</div>
+                            <div class="results-pod__content">
+                                <div class="grid">
+                                    <div class="grid__item">
+                                        <table class="table">
+                                            <thead class="table__header-row">
+                                                <tr class="table__row">
+                                                    <th class="table__heading">Name</th>
+                                                    <th class="table__heading">Address</th>
+                                                    <th class="table__heading">Phone Numbers</th>
+                                                    <th class="table__heading">Emails</th>
+                                                    <th class="table__heading">Source</th>
+                                                    <th class="table__heading">Upload Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table__table-body">
+                                                <template for:each={contactInformations} for:item="item">
+                                                <tr key={item.id} class="table__row table__data-row">
+                                                        <td class="table__data-cell" data-heading="Name">{item.contactName}</td>
+                                                        <td class="table__data-cell" data-heading="Address">
+                                                            <template if:true={item.addressStreet}>
+                                                                {item.addressStreet}<br />
+                                                            </template>
+                                                            {item.addressCity}, {item.addressStateCode} {item.addressPostalCode} {item.addressCountryCode}
+                                                        </td>
+                                                        <td class="table__data-cell" data-heading="Phone Numbers">
+                                                            {item.primaryPhone}
+                                                            <template if:true={item.secondaryPhone}>
+                                                                <br />{item.secondaryPhone}
+                                                            </template>
+                                                        </td>
+                                                        <td class="table__data-cell" data-heading="Emails"></td>
+                                                        <td class="table__data-cell" data-heading="Source">{item.source}</td>
+                                                        <td class="table__data-cell" data-heading="Upload Date">{item.formattedSystemModstamp}</td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- State Licensing -->
+                        <div class="results-pod">
+                            <div class="results-pod__heading">State Licensing</div>
+                            <div class="results-pod__content">
+                                <div class="grid">
+                                    <div class="grid__item">
+                                        <table class="table">
+                                            <thead class="table__header-row">
+                                                <tr class="table__row">
+                                                    <th class="table__heading">State</th>
+                                                    <th class="table__heading">Number</th>
+                                                    <th class="table__heading">Type</th>
+                                                    <th class="table__heading">Status</th>
+                                                    <th class="table__heading">Issue Date</th>
+                                                    <th class="table__heading">Expiration Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table__table-body">
+                                                <template for:each={licenses} for:item="license">
+                                                    <tr key={license.id} class="table__row table__data-row">
+                                                        <td class="table__data-cell" data-heading="State">{license.source}</td>
+                                                        <td class="table__data-cell" data-heading="Number">{license.licenseNumber}</td>
+                                                        <td class="table__data-cell" data-heading="Type">{license.type}</td>
+                                                        <td class="table__data-cell" data-heading="Status">{license.status}</td>
+                                                        <td class="table__data-cell" data-heading="Issue Date">{license.formattedIssueDate}</td>
+                                                        <td class="table__data-cell" data-heading="Expiration Date">{license.formattedExpirationDate}</td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Core Massage School -->
+                        <div class="results-pod">
+                            <div class="results-pod__heading">Core Massage School</div>
+                            <div class="results-pod__content">
+                                <div class="grid">
+                                    <div class="grid__item">
+                                        <table class="table">
+                                            <thead class="table__header-row">
+                                                <tr class="table__row">
+                                                    <th class="table__heading">Name</th>
+                                                    <th class="table__heading">Location</th>
+                                                    <th class="table__heading">Completion/Graduation Date</th>
+                                                    <th class="table__heading">Source</th>
+                                                    <th class="table__heading">Upload Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table__table-body">
+                                                <template for:each={schools} for:item="item">
+                                                    <tr key={item.id} class="table__row table__data-row">
+                                                        <td class="table__data-cell" data-heading="Name">{item.name}</td>
+                                                        <td class="table__data-cell" data-heading="Location">
+                                                            <template if:true={item.city}>
+                                                                {item.city}, {item.state}
+                                                            </template>
+                                                            <template if:true={item.otherSchoolLocation}>
+                                                                <br />{item.otherSchoolLocation}
+                                                            </template>
+                                                        </td>
+                                                        <td class="table__data-cell" data-heading="Completion/Graduation Date">{item.formattedCompletionDate}</td>
+                                                        <td class="table__data-cell" data-heading="Source">{item.source}</td>
+                                                        <td class="table__data-cell" data-heading="Upload Date">{item.formattedSystemModstamp}</td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Board/Disciplinary Action -->
+                        <div class="results-pod">
+                            <div class="results-pod__heading">Board/Disciplinary Action</div>
+                            <div class="results-pod__content">
+                                <div class="grid">
+                                    <div class="grid__item">
+                                        <table class="table">
+                                            <thead class="table__header-row">
+                                                <tr class="table__row">
+                                                    <th class="table__heading">Source</th>
+                                                    <th class="table__heading">Status</th>
+                                                    <th class="table__heading">Date of Last Action</th>
+                                                    <th class="table__heading">NPDB Code</th>
+                                                    <th class="table__heading">Details</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table__table-body">
+                                                <template for:each={disciplinaryActions} for:item="item">
+                                                    <tr key={item.id} class="table__row table__data-row">
+                                                        <td class="table__data-cell" data-heading="Source">{item.source}</td>
+                                                        <td class="table__data-cell" data-heading="Status">{item.status}</td>
+                                                        <td class="table__data-cell" data-heading="Date of Last Action">{item.formattedDateOfLastAction}</td>
+                                                        <td class="table__data-cell" data-heading="NPDB Code">{item.npdbCode}</td>
+                                                        <td class="table__data-cell" data-heading="Details">{item.details}</td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Professional Continuing Education -->
+                        <div class="results-pod">
+                            <div class="results-pod__heading">Professional Continuing Education</div>
+                            <div class="results-pod__content">
+                                <div class="grid">
+                                    <div class="grid__item">
+                                        <table class="table">
+                                            <thead class="table__header-row">
+                                                <tr class="table__row">
+                                                    <th class="table__heading"></th>
+                                                    <th class="table__heading">Completion Date</th>
+                                                    <th class="table__heading">Course Full Name</th>
+                                                    <th class="table__heading">Course Category</th>
+                                                    <th class="table__heading">Course Type</th>
+                                                    <th class="table__heading">Hours Earned</th>
+                                                    <th class="table__heading">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="table__table-body">
+                                                <template for:each={pceWrappers} for:item="item">
+                                                    <tr key={item.id} class="table__row table__data-row">
+                                                        <td class="table__data-cell">
+                                                            <template if:true={item.iconUrl}>
+                                                                <img src={item.iconUrl} alt="action item image" class="pce-action-icon" />
+                                                            </template>
+                                                        </td>
+                                                        <td class="table__data-cell" data-heading="Completion Date">{item.formattedCompletedOn}</td>
+                                                        <td class="table__data-cell" data-heading="Course Full Name">{item.courseName}</td>
+                                                        <td class="table__data-cell" data-heading="Course Category">
+                                                            {item.category}
+                                                            <template if:true={item.subCategory}>
+                                                                - {item.subCategory}
+                                                            </template>
+                                                        </td>
+                                                        <td class="table__data-cell" data-heading="Course Type">{item.courseType}</td>
+                                                        <td class="table__data-cell" data-heading="Hours Earned">{item.hoursEarned}</td>
+                                                        <td class="table__data-cell" data-heading="Actions">
+                                                            <a href="#" onclick={handlePCEReportClick} data-record-id={item.id} data-contact-id={item.contactId} data-url={item.url}>See More</a>
+                                                        </td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+
+                                        <div class="legend">
+                                            <div class="legend__item">
+                                                <img src={revokedIconUrl} alt="Revoked" class="legend__icon legend__icon--revoked" />
+                                                <span>Revoked</span>
+                                            </div>
+                                            <div class="legend__item">
+                                                <img src={restrictedIconUrl} alt="Restricted" class="legend__icon legend__icon--restricted" />
+                                                <span>Restricted</span>
+                                            </div>
+                                            <div class="legend__item">
+                                                <img src={underReviewIconUrl} alt="Under Review" class="legend__icon legend__icon--under-review" />
+                                                <span>Under Review</span>
+                                            </div>
+                                            <div class="legend__item">
+                                                <img src={provisionalIconUrl} alt="Provisional" class="legend__icon legend__icon--provisional" />
+                                                <span>Provisional</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </template>
+    </div>
+</template>

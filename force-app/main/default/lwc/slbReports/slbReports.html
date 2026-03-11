@@ -1,0 +1,199 @@
+<template>
+    <div class="slb-reports-container">
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+
+        <template if:true={error}>
+            <div class="slds-m-around_medium slds-text-color_error">
+                {error}
+            </div>
+        </template>
+
+        <template if:false={isLoading}>
+            <template if:false={error}>
+                <header class="page-header">
+                    <div class="page-header__title-row">
+                        <h1 class="page-header__heading">MTLD Reports</h1>
+                    </div>
+                </header>
+
+                <div class="slb-reports-page">
+                    <div class="slb-reports-page__header-content">
+                        <div class="field">
+                            <label for="report-select" class="label label--bold">
+                                Choose a report:
+                            </label>
+                            <lightning-combobox
+                                name="report-select"
+                                value={selectedReport}
+                                placeholder="Select a report"
+                                options={reportOptions}
+                                onchange={handleReportChange}
+                                class="input input--select-menu">
+                            </lightning-combobox>
+                        </div>
+                    </div>
+
+                    <div class="slb-reports-page__results">
+                        <template if:true={showNoReportSelected}>
+                            <p>Please choose a report from the dropdown above.</p>
+                        </template>
+
+                        <!-- Therapists with 3 or More Licenses: grouped by therapist -->
+                        <template if:true={isThreeLicenses}>
+                            <template for:each={threeLicenseTherapistGroups} for:item="group">
+                                <div key={group.therapistId} class="therapist-section">
+                                    <div class="therapist-section__banner">
+                                        <span class="therapist-section__name" data-therapist-id={group.therapistId} onclick={navigateToTherapistReport}>
+                                            {group.therapistName}
+                                        </span>
+                                        <a href="#" class="therapist-section__link" data-therapist-id={group.therapistId} onclick={navigateToTherapistReport}>
+                                            See Therapist Details
+                                        </a>
+                                    </div>
+                                    <div class="therapist-section__table-wrap">
+                                        <table class="report-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>State/Territory</th>
+                                                    <th>Number</th>
+                                                    <th>Type</th>
+                                                    <th>Status</th>
+                                                    <th>Issue Date</th>
+                                                    <th>Expiration Date</th>
+                                                    <th>Therapist Name</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <template for:each={group.licenses} for:item="lic">
+                                                    <tr key={lic.licenseNumber}>
+                                                        <td>{lic.source}</td>
+                                                        <td>{lic.licenseNumber}</td>
+                                                        <td>{lic.licenseType}</td>
+                                                        <td>{lic.status}</td>
+                                                        <td>{lic.issueDateFormatted}</td>
+                                                        <td>{lic.expirationDateFormatted}</td>
+                                                        <td>{lic.therapistNameOnLicense}</td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- Therapists with Board Actions: Licenses + Board/Disciplinary Actions per therapist -->
+                        <template if:true={isBoardActions}>
+                            <template for:each={disciplineGroupsFormatted} for:item="group">
+                                <div key={group.therapistId} class="therapist-section">
+                                    <div class="therapist-section__banner">
+                                        <span class="therapist-section__name" data-therapist-id={group.therapistId} onclick={navigateToTherapistReport}>
+                                            {group.therapistName}
+                                        </span>
+                                        <a href="#" class="therapist-section__link" data-therapist-id={group.therapistId} onclick={navigateToTherapistReport}>
+                                            See Therapist Details
+                                        </a>
+                                    </div>
+                                    <div class="therapist-section__subsection">
+                                        <h4 class="therapist-section__subheading">Licenses</h4>
+                                        <div class="therapist-section__table-wrap">
+                                            <table class="report-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>State/Territory</th>
+                                                        <th>Number</th>
+                                                        <th>Type</th>
+                                                        <th>Status</th>
+                                                        <th>Issue Date</th>
+                                                        <th>Expiration Date</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <template for:each={group.licenses} for:item="lic">
+                                                        <tr key={lic.licenseNumber}>
+                                                            <td>{lic.source}</td>
+                                                            <td>{lic.licenseNumber}</td>
+                                                            <td>{lic.licenseType}</td>
+                                                            <td>{lic.status}</td>
+                                                            <td>{lic.issueDateFormatted}</td>
+                                                            <td>{lic.expirationDateFormatted}</td>
+                                                        </tr>
+                                                    </template>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="therapist-section__subsection">
+                                        <h4 class="therapist-section__subheading">Board/Disciplinary Actions</h4>
+                                        <div class="therapist-section__table-wrap">
+                                            <table class="report-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>State/Territory</th>
+                                                        <th>Status</th>
+                                                        <th>Date of Last Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <template for:each={group.disciplinaryActions} for:item="act">
+                                                        <tr key={act.source}>
+                                                            <td>{act.source}</td>
+                                                            <td>{act.status}</td>
+                                                            <td>{act.dateOfLastActionFormatted}</td>
+                                                        </tr>
+                                                    </template>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </template>
+
+                        <!-- Therapists with Exam Alerts: license table per therapist -->
+                        <template if:true={isExamAlerts}>
+                            <template for:each={examAlertGroupsFormatted} for:item="group">
+                                <div key={group.therapistId} class="therapist-section">
+                                    <div class="therapist-section__banner">
+                                        <span class="therapist-section__name" data-therapist-id={group.therapistId} onclick={navigateToTherapistReport}>
+                                            {group.therapistName}
+                                        </span>
+                                        <a href="#" class="therapist-section__link" data-therapist-id={group.therapistId} onclick={navigateToTherapistReport}>
+                                            See Therapist Details
+                                        </a>
+                                    </div>
+                                    <div class="therapist-section__table-wrap">
+                                        <table class="report-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>State/Territory</th>
+                                                    <th>License Number</th>
+                                                    <th>License Type</th>
+                                                    <th>License Status</th>
+                                                    <th>Name Provided</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <template for:each={group.licenses} for:item="lic">
+                                                    <tr key={lic.licenseNumber}>
+                                                        <td>{lic.source}</td>
+                                                        <td>{lic.licenseNumber}</td>
+                                                        <td>{lic.licenseType}</td>
+                                                        <td>{lic.status}</td>
+                                                        <td>{lic.nameProvided}</td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </template>
+    </div>
+</template>

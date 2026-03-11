@@ -1,0 +1,120 @@
+// ============================================
+// SIMPLE TEST FOR "Sim Ship 22 Nov" ACCOUNT
+// ============================================
+
+System.debug('========================================');
+System.debug('TESTING ACCOUNT: Sim Ship 22 Nov');
+System.debug('========================================');
+
+// Query the account
+Account acc = [
+    SELECT Id, Name, Membership_Status__c, Registration_Status__c,
+           Registration_Status_Flag__c, Survey_Total_Happy__c,
+           Membership_Expiration_Date__c, Allow_Renewal__c,
+           Current_Active_Action_Status__c
+    FROM Account 
+    WHERE Name = 'Sim Ship 22 Nov'
+    LIMIT 1
+];
+
+System.debug('Account: ' + acc.Name);
+System.debug('Account ID: ' + acc.Id);
+System.debug('');
+
+// Test 1: Check Current Status Values
+System.debug('========================================');
+System.debug('CURRENT STATUS VALUES:');
+System.debug('========================================');
+System.debug('Membership Status: ' + acc.Membership_Status__c);
+System.debug('Registration Status: ' + acc.Registration_Status__c);
+System.debug('Registration Flag: ' + acc.Registration_Status_Flag__c);
+System.debug('Survey Total Happy: ' + acc.Survey_Total_Happy__c);
+System.debug('Membership Exp Date: ' + acc.Membership_Expiration_Date__c);
+System.debug('Allow Renewal: ' + acc.Allow_Renewal__c);
+System.debug('');
+
+// Test 2: Verify Registration Status Logic
+System.debug('========================================');
+System.debug('VERIFICATION: Registration Status');
+System.debug('========================================');
+Decimal surveyCount = acc.Survey_Total_Happy__c != null ? acc.Survey_Total_Happy__c : 0;
+System.debug('Survey Total Happy: ' + surveyCount);
+
+if (surveyCount >= 50) {
+    Boolean isCorrect = (acc.Registration_Status__c == 'Registered' && acc.Registration_Status_Flag__c == true);
+    System.debug('Expected: Registered (Survey >= 50)');
+    System.debug('Actual: ' + acc.Registration_Status__c);
+    System.debug('Result: ' + (isCorrect ? 'PASS ✅' : 'FAIL ❌'));
+} else {
+    Boolean isCorrect = (acc.Registration_Status__c == 'Provisional' && acc.Registration_Status_Flag__c == false);
+    System.debug('Expected: Provisional (Survey < 50)');
+    System.debug('Actual: ' + acc.Registration_Status__c);
+    System.debug('Result: ' + (isCorrect ? 'PASS ✅' : 'FAIL ❌'));
+}
+System.debug('');
+
+// Test 3: Verify Membership Status Logic
+System.debug('========================================');
+System.debug('VERIFICATION: Membership Status');
+System.debug('========================================');
+System.debug('Membership Expiration Date: ' + acc.Membership_Expiration_Date__c);
+System.debug('Allow Renewal: ' + acc.Allow_Renewal__c);
+System.debug('Actual Membership Status: ' + acc.Membership_Status__c);
+
+if (acc.Membership_Expiration_Date__c != null) {
+    Integer daysDiff = System.today().daysBetween(acc.Membership_Expiration_Date__c);
+    System.debug('Days until expiration: ' + daysDiff);
+    
+    String expectedStatus = 'Active';
+    if (acc.Allow_Renewal__c == true) {
+        expectedStatus = 'Renewal';
+    } else if (daysDiff <= -60) {
+        expectedStatus = 'Expired';
+    } else if (daysDiff <= -30) {
+        expectedStatus = 'Inactive';
+    } else if (daysDiff < 0) {
+        expectedStatus = 'Lapsed';
+    }
+    
+    System.debug('Expected: ' + expectedStatus);
+    System.debug('Actual: ' + acc.Membership_Status__c);
+    System.debug('Result: ' + (acc.Membership_Status__c == expectedStatus ? 'PASS ✅' : 'FAIL ❌'));
+} else {
+    System.debug('Expected: Active (default when no expiration date)');
+    System.debug('Actual: ' + acc.Membership_Status__c);
+    System.debug('Result: ' + (acc.Membership_Status__c == 'Active' ? 'PASS ✅' : 'FAIL ❌'));
+}
+System.debug('');
+
+// Test 4: Test Provisional Action Prevention
+System.debug('========================================');
+System.debug('TEST: Provisional Action Prevention');
+System.debug('========================================');
+try {
+    CEActionController.submitAction(acc.Id, 'Provisional', String.valueOf(System.today()), 'Test');
+    System.debug('Result: FAIL ❌ (Should have thrown error)');
+} catch (Exception e) {
+    System.debug('Error: ' + e.getMessage());
+    System.debug('Result: ' + (e.getMessage().contains('Provisional') ? 'PASS ✅' : 'FAIL ❌'));
+}
+System.debug('');
+
+// Test 5: Test Valid Action
+System.debug('========================================');
+System.debug('TEST: Valid Action Creation');
+System.debug('========================================');
+try {
+    CEActionController.submitAction(acc.Id, 'Under Review', String.valueOf(System.today()), 'Test');
+    Account result = [SELECT Current_Active_Action_Status__c FROM Account WHERE Id = :acc.Id];
+    System.debug('Action Status: ' + result.Current_Active_Action_Status__c);
+    System.debug('Result: ' + (result.Current_Active_Action_Status__c == 'Under Review' ? 'PASS ✅' : 'FAIL ❌'));
+} catch (Exception e) {
+    System.debug('Error: ' + e.getMessage());
+    System.debug('Result: FAIL ❌');
+}
+System.debug('');
+
+System.debug('========================================');
+System.debug('ALL TESTS COMPLETED');
+System.debug('========================================');
+

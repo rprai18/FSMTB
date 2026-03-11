@@ -1,0 +1,278 @@
+<template>
+    <!-- Loading State -->
+    <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </template>
+    
+    <!-- Main Content -->
+    <template if:false={isLoading}>
+        <!-- Header Section -->
+        <div class="header-section">
+            <img src={headerImage} alt="Header" class="header-section__image"/>
+            <h1 class="page-header__heading">Register as a CE Provider</h1>
+        </div>
+        
+        <!-- Content from Metadata -->
+        <template if:true={showContent}>
+            <div class="content-wrap">
+                <div class="content-text" data-id="content" lwc:dom="manual"></div>
+            </div>
+        </template>
+        
+        <!-- Step 1: Registration Form -->
+        <template if:true={showForm}>
+            <div class="detailListform">
+                <div class="section-header">Organization Information</div>
+                <lightning-card>
+                    <div class="slds-p-around_medium slds-grid slds-wrap slds-gutters">
+                        <!-- Business Name -->
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input
+                                label="Business Name"
+                                value={businessName}
+                                data-id="businessName"
+                                required
+                                message-when-value-missing="Field is required. If you do not have a business name, insert your name here."
+                                onchange={handleBusinessNameChange}>
+                            </lightning-input>
+                            <!-- Business Name Error -->
+                            <div data-id="businessNameError" class="slds-hide slds-text-color_error slds-m-top_x-small">
+                                Field is required. If you do not have a business name, insert your name here.
+                            </div>
+                            <!-- Business Name Duplication Error -->
+                            <div data-id="businessNameDuplicationError" class="slds-hide slds-text-color_error slds-m-top_x-small">
+                                <span class="error-message">The Provider Name already exists in our system. Please provide a new name or contact FSMTB at&nbsp;</span>
+                                <a href="mailto:CE@fsmtb.org?subject=CE Portal Account Name Taken">CE@fsmtb.org</a>
+                                <span>&nbsp;with questions.</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Business Email -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input
+                                label="Business Email"
+                                type="email"
+                                value={businessEmail}
+                                data-id="businessEmail"
+                                required
+                                message-when-value-missing="Active email is required and must be formatted as an email address."
+                                onchange={handleEmailChange}>
+                            </lightning-input>
+                        </div>
+                        
+                        <!-- Re-enter Email -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input
+                                label="Re-Enter Email"
+                                type="email"
+                                value={reEnterEmail}
+                                data-id="reEnterEmail"
+                                required
+                                message-when-value-missing="Email address must match."
+                                onchange={handleEmailChange}>
+                            </lightning-input>
+                        </div>
+                        
+                        <!-- Business Address 1 -->
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-textarea
+                                label="Business Address 1"
+                                value={businessAddress1}
+                                required
+                                message-when-value-missing="Address is required."
+                                onchange={handleChange}>
+                            </lightning-textarea>
+                        </div>
+                        
+                        <!-- Business Address 2 -->
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-textarea
+                                label="Business Address 2"
+                                value={businessAddress2}
+                                onchange={handleChange}>
+                            </lightning-textarea>
+                        </div>
+                        
+                        <!-- City -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input
+                                label="City"
+                                value={city}
+                                required
+                                message-when-value-missing="City is required."
+                                onchange={handleChange}>
+                            </lightning-input>
+                        </div>
+                        
+                        <!-- State -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox
+                                label="State"
+                                value={state}
+                                options={stateOptions}
+                                required
+                                message-when-value-missing="State is required."
+                                onchange={handleChange}>
+                            </lightning-combobox>
+                        </div>
+                        
+                        <!-- Zip Code -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input
+                                label="Zip Code"
+                                value={zip}
+                                required
+                                message-when-value-missing="Zip code is required."
+                                onchange={handleChange}>
+                            </lightning-input>
+                        </div>
+                        
+                        <!-- Business Phone -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input
+                                label="Business Phone"
+                                type="tel"
+                                value={businessPhone}
+                                placeholder="###-###-####"
+                                required
+                                message-when-value-missing="Telephone number is required."
+                                onchange={handleChange}>
+                            </lightning-input>
+                        </div>
+                        
+                        <!-- Business Fax -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input
+                                label="Business Fax"
+                                type="tel"
+                                value={fax}
+                                placeholder="###-###-####"
+                                onchange={handleChange}>
+                            </lightning-input>
+                        </div>
+                        
+                        <!-- Business Website -->
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input
+                                label="Business Website"
+                                type="url"
+                                value={website}
+                                placeholder="http://www.website.com"
+                                onchange={handleChange}>
+                            </lightning-input>
+                        </div>
+                    </div>
+                </lightning-card>
+                
+                <!-- Registry Account Owner Section -->
+                <div class="section-header">Registry Account Owner</div>
+                <lightning-card>
+                    <div class="slds-p-around_medium">
+                        <p class="slds-text-body_small slds-m-bottom_medium">
+                            The registry account owner is ultimately responsible for any information uploaded by users associated with this provider account.
+                        </p>
+                    </div>
+                    <div class="slds-p-around_medium slds-grid slds-wrap slds-gutters">
+                        <!-- First Name -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input
+                                label="First Name"
+                                value={firstName}
+                                required
+                                message-when-value-missing="First name is required."
+                                onchange={handleChange}>
+                            </lightning-input>
+                        </div>
+                        
+                        <!-- Last Name -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input
+                                label="Last Name"
+                                value={lastName}
+                                required
+                                message-when-value-missing="Last name is required."
+                                onchange={handleChange}>
+                            </lightning-input>
+                        </div>
+                        
+                        <!-- Username -->
+                        <div class="slds-col slds-size_1-of-1">
+                            <lightning-input
+                                label="Username"
+                                value={username}
+                                data-id="username"
+                                required
+                                message-when-value-missing="Username is required."
+                                onchange={handleChange}>
+                            </lightning-input>
+                        </div>
+                        
+                        <!-- Email -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input
+                                label="Email"
+                                type="email"
+                                value={ownerEmail}
+                                data-id="ownerEmail"
+                                required
+                                message-when-value-missing="Active email is required and must be formatted as an email address."
+                                onchange={handleEmailChange}>
+                            </lightning-input>
+                        </div>
+                        
+                        <!-- Re-enter Email -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input
+                                label="Re-Enter Email"
+                                type="email"
+                                value={ownerReEnterEmail}
+                                data-id="ownerReEnterEmail"
+                                required
+                                message-when-value-missing="Email address must match."
+                                onchange={handleEmailChange}>
+                            </lightning-input>
+                        </div>
+                        
+                        <!-- Phone -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input
+                                label="Phone"
+                                type="tel"
+                                value={ownerPhone}
+                                placeholder="###-###-####"
+                                required
+                                message-when-value-missing="Telephone number is required."
+                                onchange={handleChange}>
+                            </lightning-input>
+                        </div>
+                        
+                        <!-- Title -->
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-input
+                                label="Title"
+                                value={title}
+                                onchange={handleChange}>
+                            </lightning-input>
+                        </div>
+                    </div>
+                </lightning-card>
+                
+                <!-- Next Button -->
+                <div class="button-container slds-m-top_medium slds-text-align_center">
+                    <lightning-button
+                        variant="brand"
+                        label={buttonLabel}
+                        onclick={handleNextOrAccept}
+                        disabled={isLoading}>
+                    </lightning-button>
+                </div>
+            </div>
+        </template>
+        
+    </template>
+    
+    <!-- Footer -->
+    <div class="footer">
+        ©2025 FSMTB ALL RIGHTS RESERVED.
+    </div>
+</template>

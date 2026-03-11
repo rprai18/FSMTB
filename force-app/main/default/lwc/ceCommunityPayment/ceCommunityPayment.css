@@ -1,0 +1,201 @@
+/* Import portal styles - using content-wrap from global.css */
+.payment-container {
+    font-family: Montserrat, sans-serif;
+    color: #3e3e3e;
+    max-width: 100%;
+}
+
+/* Header Section - matches portal page-header styling */
+.header-section {
+    background-color: #a3c0e1;
+    margin-bottom: 2em;
+    padding: 3em 1em;
+    position: relative;
+    overflow: hidden;
+}
+
+.header-section__image {
+    position: absolute;
+    bottom: 0;
+    height: 100%;
+    right: 0;
+    top: 0;
+    opacity: 0.5;
+    display: block;
+    z-index: 0;
+}
+
+@media screen and (min-width: 40em) {
+    .header-section {
+        padding: 3em 1em;
+        overflow: hidden;
+    }
+    
+    .header-section__image {
+        left: 50%;
+        right: auto;
+        height: 100%;
+        width: auto;
+    }
+}
+
+.page-title {
+    font-size: 2.25em;
+    font-weight: 700;
+    color: #3e3e3c;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    padding: 0;
+    display: block;
+}
+
+@media screen and (min-width: 64em) {
+    .page-title {
+        max-width: 60%;
+    }
+}
+
+/* Content Section */
+.content-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.content-wrap--skinny {
+    max-width: 800px;
+    margin: 2rem auto;
+}
+
+.fee-content {
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+    color: #3e3e3e;
+}
+
+.content-section {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 4px;
+}
+
+.content-section p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.content-section a {
+    color: #1976d2;
+    text-decoration: none;
+}
+
+.content-section a:hover {
+    text-decoration: underline;
+}
+
+/* Form Styles */
+.form {
+    margin: 2rem 0;
+    background-color: #fff;
+    padding: 1.5rem;
+    border-radius: 4px;
+    border: 1px solid #d8dde6;
+}
+
+.form-error-message {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: #f4f6f9;
+    border-left: 4px solid #c23934;
+    margin-bottom: 1rem;
+}
+
+.form-error-message lightning-icon {
+    flex-shrink: 0;
+}
+
+.legend {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #3e3e3c;
+    margin-bottom: 1rem;
+    padding: 0;
+    border: none;
+}
+
+.legend--primary {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.field {
+    margin-bottom: 1rem;
+}
+
+.field-group {
+    border: none;
+    padding: 0;
+    margin: 0 0 1rem 0;
+}
+
+.field-group__label {
+    font-size: 1rem;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+}
+
+.field-list {
+    display: flex;
+    gap: 1rem;
+}
+
+.field-list--inline {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.field-list__item {
+    flex: 1;
+    min-width: 150px;
+}
+
+.authorization-text {
+    font-size: 0.875rem;
+    color: #706e6b;
+    margin: 1rem 0;
+    padding-top: 1rem;
+    border-top: 1px solid #d8dde6;
+}
+
+.js-button-wrap {
+    margin-top: 1.5rem;
+}
+
+/* Required field indicator */
+.slds-required {
+    color: #c23934;
+    margin: 0 0.125rem;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 48em) {
+    .field-list--inline {
+        flex-direction: column;
+    }
+    
+    .field-list__item {
+        width: 100%;
+    }
+    
+    .header-section {
+        padding: 2em 1em;
+    }
+    
+    .page-title {
+        font-size: 1.75em;
+    }
+}
+

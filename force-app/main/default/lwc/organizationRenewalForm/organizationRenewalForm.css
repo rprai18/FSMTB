@@ -1,0 +1,127 @@
+/* Import portal styles - using content-wrap from global.css */
+.content-wrap {
+    font-family: Montserrat, sans-serif;
+    color: #3e3e3e;
+    max-width: 100%;
+}
+
+/* Header Section - matches portal page-header styling */
+.header-section {
+    background-color: #a3c0e1;
+    margin-bottom: 2em;
+    padding: 3em 1em;
+    position: relative;
+    overflow: hidden;
+}
+
+.header-section__image {
+    position: absolute;
+    bottom: 0;
+    height: 100%;
+    right: 0;
+    top: 0;
+    opacity: 0.5;
+    display: block;
+    z-index: 0;
+}
+
+@media screen and (min-width: 40em) {
+    .header-section {
+        padding: 3em 1em;
+        overflow: hidden;
+    }
+    
+    .header-section__image {
+        left: 50%;
+        right: auto;
+        height: 100%;
+        width: auto;
+    }
+}
+
+.page-title {
+    font-size: 2.25em;
+    font-weight: 700;
+    color: #3e3e3c;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    padding: 0;
+    display: block;
+}
+
+@media screen and (min-width: 64em) {
+    .page-title {
+        max-width: 60%;
+    }
+}
+
+.form-container {
+    background: #ffffff;
+    padding: 1.5rem 2rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto 2rem;
+}
+
+.section-header {
+    background: #0a4e9b;
+    color: #ffffff;
+    font-weight: 700;
+    padding: 0.6rem 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 16px;
+}
+
+.form-description {
+    font-size: 14px;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 3rem;
+    row-gap: 1rem;
+}
+
+.form-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-item.full-width {
+    grid-column: 1 / span 2;
+}
+
+.field-label {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: #333;
+    text-transform: uppercase;
+}
+
+.required-wrapper {
+    display: flex;
+    align-items: stretch;
+}
+
+.required-bar {
+    width: 4px;
+    background-color: #c23934;
+    margin-right: 4px;
+}
+
+.display-field {
+    border: 1px solid #d8dde6;
+    padding: 0.5rem 0.75rem;
+    background: #f9f9f9;
+    font-size: 14px;
+    color: #333;
+}
+
+.btn-container {
+    text-align: center;
+    margin-top: 2rem;
+}

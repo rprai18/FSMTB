@@ -1,0 +1,140 @@
+// ============================================
+// EASY TEST SCRIPT - What We CAN Test
+// ============================================
+// Since both roll-up fields can't be set directly,
+// we'll test what we CAN test: Default values and Action Status
+// ============================================
+
+System.debug('========================================');
+System.debug('EASY TEST - Default Values & Actions');
+System.debug('========================================');
+
+// Test 1: Create New Account and verify default statuses
+Account testAcc = new Account(
+    Name = 'Test Account Status - ' + System.now(),
+    RecordTypeId = [SELECT Id FROM RecordType WHERE DeveloperName = 'CE_Provider' AND SobjectType = 'Account' LIMIT 1].Id
+    // Note: Website field may have validation rules, so we leave it blank
+    // If Website is required, uncomment the line below:
+    // Website = 'https://test.example.com'
+);
+insert testAcc;
+
+Account result1 = [SELECT Membership_Status__c, Registration_Status__c, Registration_Status_Flag__c,
+                          Membership_Expiration_Date__c, Survey_Total_Happy__c
+                   FROM Account WHERE Id = :testAcc.Id];
+
+System.debug('✅ TEST 1: New Account Default Statuses');
+System.debug('   Membership Status: ' + result1.Membership_Status__c); // Should be "Active"
+System.debug('   Registration Status: ' + result1.Registration_Status__c); // Should be "Provisional"
+System.debug('   Registration Flag: ' + result1.Registration_Status_Flag__c); // Should be false
+System.debug('   Result: ' + (result1.Membership_Status__c == 'Active' && 
+                               result1.Registration_Status__c == 'Provisional' ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('');
+
+// Test 2: Test Allow_Renewal__c update (if writable)
+try {
+    testAcc.Allow_Renewal__c = true;
+    update testAcc;
+    
+    Account result2 = [SELECT Membership_Status__c FROM Account WHERE Id = :testAcc.Id];
+    
+    System.debug('✅ TEST 2: Membership Status = Renewal (Allow_Renewal__c = true)');
+    System.debug('   Membership Status: ' + result2.Membership_Status__c); // Should be "Renewal"
+    System.debug('   Result: ' + (result2.Membership_Status__c == 'Renewal' ? 'PASS ✅' : 'FAIL ❌'));
+    System.debug('');
+} catch (Exception e) {
+    System.debug('⚠️  TEST 2: Allow_Renewal__c may not be writable');
+    System.debug('   Error: ' + e.getMessage());
+    System.debug('');
+}
+
+// Test 3: Test Provisional Action Prevention
+System.debug('✅ TEST 3: Provisional Action Prevention');
+try {
+    CEActionController.submitAction(
+        testAcc.Id, 
+        'Provisional', // This should be rejected
+        String.valueOf(System.today()), 
+        'Test reason'
+    );
+    System.debug('   Result: FAIL ❌ (Should have thrown error)');
+} catch (Exception e) {
+    System.debug('   Error Message: ' + e.getMessage());
+    System.debug('   Result: ' + (e.getMessage().contains('Provisional') ? 'PASS ✅' : 'FAIL ❌'));
+}
+System.debug('');
+
+// Test 4: Test Valid Action Creation
+System.debug('✅ TEST 4: Valid Action Creation');
+try {
+    CEActionController.submitAction(
+        testAcc.Id, 
+        'Under Review', // Valid action
+        String.valueOf(System.today()), 
+        'Test reason'
+    );
+    
+    Account result4 = [SELECT Current_Active_Action_Status__c FROM Account WHERE Id = :testAcc.Id];
+    System.debug('   Action Status: ' + result4.Current_Active_Action_Status__c); // Should be "Under Review"
+    System.debug('   Result: ' + (result4.Current_Active_Action_Status__c == 'Under Review' ? 'PASS ✅' : 'FAIL ❌'));
+} catch (Exception e) {
+    System.debug('   Error: ' + e.getMessage());
+    System.debug('   Result: FAIL ❌');
+}
+System.debug('');
+
+// Test 5: Verify Available Actions (should not include Provisional)
+System.debug('✅ TEST 5: Available Actions List');
+List<String> availableActions = CEActionController.getAvailableActions(testAcc.Id);
+System.debug('   Available Actions: ' + availableActions);
+Boolean hasProvisional = availableActions.contains('Provisional') || 
+                         availableActions.contains('Provisional & Restricted') ||
+                         availableActions.contains('Provisional & Under Review') ||
+                         availableActions.contains('Provisional & Internal Investigation');
+System.debug('   Contains Provisional: ' + hasProvisional);
+System.debug('   Result: ' + (!hasProvisional ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('');
+
+// Test 6: Check existing accounts to see if statuses are calculated
+System.debug('✅ TEST 6: Check Existing Accounts');
+try {
+    List<Account> existingAccounts = [SELECT Id, Name, Membership_Status__c, Registration_Status__c,
+                                             Membership_Expiration_Date__c, Survey_Total_Happy__c,
+                                             Registration_Status_Date__c, Registration_Status_Flag__c
+                                      FROM Account 
+                                      WHERE RecordType.DeveloperName = 'CE_Provider'
+                                      LIMIT 5];
+    
+    System.debug('   Found ' + existingAccounts.size() + ' existing accounts:');
+    for (Account acc : existingAccounts) {
+        System.debug('   - ' + acc.Name + ':');
+        System.debug('     Membership Status: ' + acc.Membership_Status__c);
+        System.debug('     Registration Status: ' + acc.Registration_Status__c);
+        System.debug('     Survey Total Happy: ' + acc.Survey_Total_Happy__c);
+        System.debug('     Membership Exp Date: ' + acc.Membership_Expiration_Date__c);
+        
+        // Verify logic: If Survey_Total_Happy__c >= 50, should be Registered
+        if (acc.Survey_Total_Happy__c != null) {
+            if (acc.Survey_Total_Happy__c >= 50) {
+                System.debug('     ✅ Should be Registered: ' + (acc.Registration_Status__c == 'Registered' ? 'CORRECT ✅' : 'INCORRECT ❌'));
+            } else {
+                System.debug('     ✅ Should be Provisional: ' + (acc.Registration_Status__c == 'Provisional' ? 'CORRECT ✅' : 'INCORRECT ❌'));
+            }
+        }
+        System.debug('');
+    }
+} catch (Exception e) {
+    System.debug('   Error: ' + e.getMessage());
+}
+System.debug('');
+
+System.debug('========================================');
+System.debug('ALL TESTS COMPLETED');
+System.debug('========================================');
+System.debug('');
+System.debug('NOTE: Registration/Membership Status updates happen when:');
+System.debug('  1. Course records change → Survey_Total_Happy__c roll-up updates');
+System.debug('  2. Membership__c records change → Membership_Expiration_Date__c roll-up updates');
+System.debug('  3. Trigger automatically recalculates statuses');
+System.debug('========================================');
+

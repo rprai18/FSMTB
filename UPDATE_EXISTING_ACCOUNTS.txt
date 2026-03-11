@@ -1,0 +1,95 @@
+// ============================================
+// SCRIPT TO UPDATE EXISTING ACCOUNTS
+// This will trigger the status calculation logic
+// ============================================
+
+System.debug('========================================');
+System.debug('UPDATING EXISTING ACCOUNTS TO CALCULATE STATUSES');
+System.debug('========================================');
+
+// Get existing accounts that need status calculation
+List<Account> accountsToUpdate = [
+    SELECT Id, Name, Membership_Status__c, Registration_Status__c,
+           Membership_Expiration_Date__c, Survey_Total_Happy__c,
+           Allow_Renewal__c, RecordTypeId
+    FROM Account 
+    WHERE RecordType.DeveloperName = 'CE_Provider'
+    AND (Membership_Status__c = null OR Registration_Status__c = null)
+    LIMIT 200
+];
+
+System.debug('Found ' + accountsToUpdate.size() + ' accounts that need status calculation');
+System.debug('');
+
+// Update accounts to trigger the status calculation
+// We'll do a simple update which will trigger beforeUpdate and calculate statuses
+List<Account> toUpdate = new List<Account>();
+for (Account acc : accountsToUpdate) {
+    // Create an update record - just touch the record to trigger the trigger
+    Account accUpdate = new Account(Id = acc.Id);
+    toUpdate.add(accUpdate);
+}
+
+System.debug('Updating ' + toUpdate.size() + ' accounts...');
+update toUpdate;
+
+System.debug('Update completed! Trigger should have calculated statuses.');
+System.debug('');
+
+// Query back to verify statuses were calculated
+List<Account> updatedAccounts = [
+    SELECT Id, Name, Membership_Status__c, Registration_Status__c,
+           Registration_Status_Flag__c, Registration_Status_Date__c,
+           Membership_Expiration_Date__c, Survey_Total_Happy__c
+    FROM Account 
+    WHERE Id IN :toUpdate
+    LIMIT 10
+];
+
+System.debug('========================================');
+System.debug('VERIFICATION - First 10 Updated Accounts:');
+System.debug('========================================');
+
+Integer correctCount = 0;
+Integer totalCount = 0;
+
+for (Account acc : updatedAccounts) {
+    System.debug('Account: ' + acc.Name);
+    System.debug('  Membership Status: ' + acc.Membership_Status__c);
+    System.debug('  Registration Status: ' + acc.Registration_Status__c);
+    System.debug('  Registration Flag: ' + acc.Registration_Status_Flag__c);
+    System.debug('  Survey Total Happy: ' + acc.Survey_Total_Happy__c);
+    System.debug('  Membership Exp Date: ' + acc.Membership_Expiration_Date__c);
+    
+    // Verify Registration Status logic
+    if (acc.Survey_Total_Happy__c != null) {
+        totalCount++;
+        Boolean isCorrect = false;
+        
+        if (acc.Survey_Total_Happy__c >= 50) {
+            isCorrect = (acc.Registration_Status__c == 'Registered' && acc.Registration_Status_Flag__c == true);
+            System.debug('  ✅ Should be Registered: ' + (isCorrect ? 'CORRECT ✅' : 'INCORRECT ❌'));
+        } else {
+            isCorrect = (acc.Registration_Status__c == 'Provisional' && acc.Registration_Status_Flag__c == false);
+            System.debug('  ✅ Should be Provisional: ' + (isCorrect ? 'CORRECT ✅' : 'INCORRECT ❌'));
+        }
+        
+        if (isCorrect) correctCount++;
+    }
+    
+    // Verify Membership Status is not null
+    if (acc.Membership_Status__c != null) {
+        System.debug('  ✅ Membership Status populated: ' + acc.Membership_Status__c);
+    } else {
+        System.debug('  ❌ Membership Status is still null!');
+    }
+    
+    System.debug('');
+}
+
+System.debug('========================================');
+System.debug('SUMMARY:');
+System.debug('  Accounts updated: ' + toUpdate.size());
+System.debug('  Correct Registration Status: ' + correctCount + ' out of ' + totalCount);
+System.debug('========================================');
+

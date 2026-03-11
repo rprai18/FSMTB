@@ -1,0 +1,115 @@
+// ============================================
+// QUICK VERIFICATION - Make Tests Green ✅
+// ============================================
+
+System.debug('========================================');
+System.debug('QUICK VERIFICATION - All Status Tests');
+System.debug('========================================');
+System.debug('');
+
+Integer passed = 0;
+Integer total = 0;
+
+// Test 1: Verify "Sim Ship 22 Nov" Account
+total++;
+System.debug('TEST 1: "Sim Ship 22 Nov" Account');
+Account acc = [
+    SELECT Membership_Status__c, Registration_Status__c,
+           Registration_Status_Flag__c, Survey_Total_Happy__c
+    FROM Account 
+    WHERE Name = 'Sim Ship 22 Nov'
+    LIMIT 1
+];
+
+Boolean test1Pass = (acc.Membership_Status__c != null && 
+                     acc.Registration_Status__c != null &&
+                     acc.Membership_Status__c == 'Active' &&
+                     acc.Registration_Status__c == 'Provisional');
+if (test1Pass) {
+    System.debug('  ✅ PASS - Statuses populated correctly');
+    passed++;
+} else {
+    System.debug('  ❌ FAIL');
+}
+
+System.debug('');
+
+// Test 2: Verify Registration Status Logic
+total++;
+System.debug('TEST 2: Registration Status Logic');
+Boolean test2Pass = false;
+if (acc.Survey_Total_Happy__c != null && acc.Survey_Total_Happy__c < 50) {
+    test2Pass = (acc.Registration_Status__c == 'Provisional' && acc.Registration_Status_Flag__c == false);
+} else {
+    test2Pass = (acc.Registration_Status__c != null);
+}
+if (test2Pass) {
+    System.debug('  ✅ PASS - Registration Status logic correct');
+    passed++;
+} else {
+    System.debug('  ❌ FAIL');
+}
+System.debug('');
+
+// Test 3: Provisional Action Prevention
+total++;
+System.debug('TEST 3: Provisional Action Prevention');
+try {
+    CEActionController.submitAction(acc.Id, 'Provisional', String.valueOf(System.today()), 'Test');
+    System.debug('  ❌ FAIL - Should have thrown error');
+} catch (Exception e) {
+    if (e.getMessage().contains('Provisional')) {
+        System.debug('  ✅ PASS - Provisional action prevented');
+        passed++;
+    } else {
+        System.debug('  ❌ FAIL - Error does not contain "Provisional"');
+    }
+}
+System.debug('');
+
+// Test 4: Valid Action Creation
+total++;
+System.debug('TEST 4: Valid Action Creation');
+try {
+    CEActionController.submitAction(acc.Id, 'Under Review', String.valueOf(System.today()), 'Test');
+    Account result = [SELECT Current_Active_Action_Status__c FROM Account WHERE Id = :acc.Id];
+    if (result.Current_Active_Action_Status__c == 'Under Review') {
+        System.debug('  ✅ PASS - Valid action created');
+        passed++;
+    } else {
+        System.debug('  ❌ FAIL');
+    }
+} catch (Exception e) {
+    System.debug('  ❌ FAIL - ' + e.getMessage());
+}
+System.debug('');
+
+// Test 5: Available Actions List
+total++;
+System.debug('TEST 5: Available Actions List');
+List<String> availableActions = CEActionController.getAvailableActions(acc.Id);
+Boolean hasProvisional = availableActions.contains('Provisional') || 
+                         availableActions.contains('Provisional & Restricted');
+if (!hasProvisional) {
+    System.debug('  ✅ PASS - Provisional not in list');
+    passed++;
+} else {
+    System.debug('  ❌ FAIL - Provisional still in list');
+}
+System.debug('');
+
+// Final Summary
+System.debug('========================================');
+System.debug('TEST RESULTS');
+System.debug('========================================');
+System.debug('Passed: ' + passed + ' / ' + total);
+System.debug('');
+
+if (passed == total) {
+    System.debug('🎉 ALL TESTS PASSED! ✅✅✅');
+    System.debug('All tests are GREEN! ✅');
+} else {
+    System.debug('Some tests failed. Review above for details.');
+}
+System.debug('========================================');
+

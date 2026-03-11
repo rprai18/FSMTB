@@ -1,0 +1,550 @@
+/* Import portal styles - using content-wrap from global.css */
+.roster-upload-container {
+    font-family: Montserrat, sans-serif;
+    color: #3e3e3e;
+    max-width: 100%;
+}
+
+/* Header Section - matches portal page-header styling */
+.header-section {
+    background-color: #a3c0e1;
+    margin-bottom: 2em;
+    padding: 3em 1em;
+    position: relative;
+    overflow: hidden;
+}
+
+.header-section__image {
+    position: absolute;
+    bottom: 0;
+    height: 100%;
+    right: 0;
+    top: 0;
+    opacity: 0.5;
+    display: block;
+    z-index: 0;
+}
+
+@media screen and (min-width: 40em) {
+    .header-section {
+        padding: 3em 1em;
+        overflow: hidden;
+    }
+    
+    .header-section__image {
+        left: 50%;
+        right: auto;
+        height: 100%;
+        width: auto;
+    }
+}
+
+.page-title {
+    font-size: 2.25em;
+    font-weight: 700;
+    color: #3e3e3c;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    padding: 0;
+    display: block;
+}
+
+@media screen and (min-width: 64em) {
+    .page-title {
+        max-width: 60%;
+    }
+}
+
+/* Main Content Area */
+.main-content {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Instructional Text Section */
+.instruction-section {
+    margin-bottom: 1.5rem;
+}
+
+.instruction-section .content {
+    color: #3e3e3e;
+    font-size: 1rem;
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+.instruction-section .content p {
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.instruction-section .content a {
+    color: #1976d2;
+    text-decoration: none;
+}
+
+.instruction-section .content a:hover {
+    text-decoration: underline;
+}
+
+/* Button Section */
+.button-section {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.upload-button {
+    --slds-c-button-brand-color-background: #1976d2;
+    --slds-c-button-brand-color-border: #1976d2;
+    --slds-c-button-brand-color-background-hover: #145ea8;
+    --slds-c-button-brand-color-border-hover: #145ea8;
+    --slds-c-button-brand-color-background-active: #0f4c85;
+    --slds-c-button-radius-border: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 0.75rem 2rem;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+}
+
+/* Table Section */
+.table-section {
+    margin-top: 2rem;
+}
+
+/* Datatable styling */
+lightning-datatable {
+    border: 1px solid #d8dde6;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+}
+
+/* Table header styling */
+::slotted(thead) {
+    background-color: #f0f4f8;
+}
+
+/* Modal overrides - larger size for table */
+.slds-modal.slds-fade-in-open {
+    /* Keep modal centered in viewport even with sticky page header */
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    z-index: 12000;
+}
+
+.slds-modal__container {
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    max-width: 95%;
+    width: 95%;
+    max-height: 90vh;
+    min-width: 800px;
+    margin: 0 auto;
+}
+
+/* Keep the initial "Select Course & Session" modal compact */
+.selection-modal {
+    max-width: 52rem;
+    width: 52rem;
+    min-width: 0;
+    max-height: 70vh;
+}
+
+.selection-modal .slds-modal__content {
+    max-height: calc(70vh - 140px);
+}
+
+@media screen and (max-width: 900px) {
+    .slds-modal__container {
+        min-width: 90%;
+        width: 90%;
+    }
+
+    .selection-modal {
+        width: 92%;
+        max-width: 92%;
+    }
+}
+
+.slds-modal__header {
+    background-color: #1976d2;
+    color: white;
+    border-radius: 0.75rem 0.75rem 0 0;
+    padding: 1rem 1.5rem;
+}
+
+.slds-modal__content {
+    padding: 1.5rem;
+    color: #3e3e3e;
+    line-height: 1.6;
+    max-height: calc(90vh - 140px);
+    overflow-y: auto;
+}
+
+.slds-modal__footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #d8dde6;
+}
+
+.slds-modal__footer lightning-button {
+    margin-left: 0.5rem;
+}
+
+/* Backdrop blur */
+.slds-backdrop_open {
+    backdrop-filter: blur(2px);
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 11900;
+}
+
+/* Success modal */
+.slds-theme_success {
+    background-color: #2e7d32 !important;
+    color: #fff !important;
+}
+
+/* Error modal */
+.slds-theme_error {
+    background-color: #c23934 !important;
+    color: #fff !important;
+}
+
+/* Links in modal content */
+.slds-modal__content a {
+    color: #1976d2;
+    text-decoration: underline;
+}
+
+.slds-modal__content a:hover {
+    color: #145ea8;
+}
+
+/* Upload copy rhythm tuning: keep paragraph and links visually balanced */
+.upload-instructions {
+    margin-bottom: 0.65rem;
+}
+
+.upload-instructions p {
+    margin: 0;
+    line-height: 1.45;
+}
+
+.upload-links {
+    margin-top: 0;
+    margin-bottom: 0.9rem;
+}
+
+.upload-links p {
+    margin: 0;
+    line-height: 1.35;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+    .main-content {
+        padding: 1rem;
+    }
+    
+    .page-title {
+        font-size: 1.75em;
+    }
+    
+    .header-section {
+        padding: 2em 1em;
+    }
+    
+    .button-section {
+        margin: 1.5rem 0;
+    }
+    
+    .upload-button {
+        width: 100%;
+    }
+}
+
+/* Ensure content text is properly styled */
+.content p {
+    margin-bottom: 1rem;
+    color: #3e3e3e;
+}
+
+.content a {
+    color: #1976d2;
+    text-decoration: none;
+}
+
+.content a:hover {
+    text-decoration: underline;
+}
+
+/* Entry Mode Selection */
+.entry-mode-selection {
+    padding: 1rem 0;
+    border-bottom: 1px solid #d8dde6;
+    margin-bottom: 1.5rem;
+}
+
+/* Manual Entry Table Styles */
+.manual-entry-container {
+    margin-top: 1rem;
+}
+
+.manual-entry-table-wrapper {
+    overflow-x: hidden;
+    border: 1px solid #d8dde6;
+    border-radius: 4px;
+    margin-top: 1rem;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.manual-entry-table {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+    font-size: 0.78rem;
+}
+
+.manual-entry-table thead th {
+    background-color: #f3f2f2;
+    font-weight: 600;
+    padding: 0.45rem 0.35rem;
+    white-space: normal;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.date-header-help {
+    margin-top: 0.15rem;
+    color: #6b6d70;
+    font-size: 0.62rem;
+    font-weight: 400;
+    line-height: 1.2;
+    white-space: normal;
+}
+
+.manual-entry-table tbody td {
+    padding: 0.3rem 0.25rem;
+    vertical-align: middle;
+}
+
+.manual-entry-table tbody tr:hover {
+    background-color: #fafaf9;
+}
+
+.manual-entry-table tbody tr.row-error {
+    outline: 2px solid #c23934;
+    outline-offset: -2px;
+}
+
+.required-indicator {
+    color: #c23934;
+    font-weight: bold;
+}
+
+.action-col {
+    width: 80px;
+    text-align: center;
+}
+
+.delete-row-button {
+    color: #c23934;
+}
+
+.delete-row-button:hover {
+    background-color: #fef7f7;
+}
+
+.manual-entry-table lightning-input {
+    width: 100%;
+}
+
+.manual-entry-table lightning-combobox {
+    width: 100%;
+}
+
+.manual-entry-table lightning-input .slds-input,
+.manual-entry-table lightning-combobox .slds-combobox__input {
+    font-size: 0.75rem;
+}
+
+/* Responsive adjustments for manual entry */
+@media screen and (max-width: 1200px) {
+    .manual-entry-table-wrapper {
+        overflow-x: hidden;
+    }
+    
+    .manual-entry-table {
+        min-width: 0;
+    }
+}
+
+/* Verification Modal Styles */
+.verification-modal {
+    max-width: 95%;
+    width: 95%;
+    max-height: 90vh;
+    min-width: 1000px;
+}
+
+@media screen and (max-width: 1100px) {
+    .verification-modal {
+        min-width: 90%;
+        width: 90%;
+    }
+}
+
+.validation-summary {
+    background-color: #f3f2f2;
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid #d8dde6;
+}
+
+.summary-item {
+    text-align: center;
+}
+
+.summary-label {
+    font-size: 0.875rem;
+    color: #706e6b;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.summary-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #080707;
+}
+
+.verification-table-wrapper {
+    max-height: 500px;
+    overflow-y: auto;
+    border: 1px solid #d8dde6;
+    border-radius: 4px;
+}
+
+.verification-table-wrapper lightning-datatable {
+    border: none;
+}
+
+/* Validation Error Message Styles */
+.validation-error-message {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #fef7f7;
+    border: 1px solid #c23934;
+    border-radius: 4px;
+}
+
+.validation-error-text {
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+    font-family: inherit;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: #c23934;
+    background-color: transparent;
+    border: none;
+}
+
+/* Success Modal with Table */
+.success-modal-container {
+    max-width: 95%;
+    width: 95%;
+    max-height: 90vh;
+    min-width: 900px;
+}
+
+@media screen and (max-width: 1000px) {
+    .success-modal-container {
+        min-width: 90%;
+        width: 90%;
+    }
+}
+
+.uploaded-roster-table-wrapper {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #d8dde6;
+    border-radius: 4px;
+    margin-top: 1rem;
+}
+
+.uploaded-roster-table-wrapper lightning-datatable {
+    border: none;
+}
+
+/* Verification Editable Table Styles */
+.verification-editable-table {
+    width: 100%;
+    font-size: 0.875rem;
+}
+
+.verification-editable-table thead th {
+    background-color: #f3f2f2;
+    font-weight: 600;
+    padding: 0.75rem;
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.verification-editable-table tbody td {
+    padding: 0.5rem;
+    vertical-align: middle;
+}
+
+.verification-editable-table tbody tr:hover {
+    background-color: #fafaf9;
+}
+
+.verification-editable-table lightning-input {
+    width: 100%;
+}
+
+.verification-editable-table lightning-input .slds-input {
+    font-size: 0.875rem;
+}
+
+.status-pill {
+    display: inline-block;
+    min-width: 72px;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.02em;
+    color: #ffffff;
+}
+
+.status-pill-valid {
+    background-color: #2e844a;
+}
+
+.status-pill-invalid {
+    background-color: #c23934;
+}
+
+.verification-table-wrapper {
+    max-height: 500px;
+    overflow-y: auto;
+}

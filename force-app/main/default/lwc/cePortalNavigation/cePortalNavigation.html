@@ -1,0 +1,202 @@
+<template>
+    <div class="portal-navigation-container">
+        <!-- Header with Logo and Title -->
+        <header class="portal-header">
+            <div class="portal-header__content">
+                <div class="portal-header__left">
+                    <img src={logoUrl} alt="FSMTB Logo" class="portal-header__logo"/>
+                    <div class="portal-header__registry-text">
+                        <span class="portal-header__ce">CE</span>
+                        <span class="portal-header__registry">REGISTRY</span>
+                    </div>
+                </div>
+                <!-- Hamburger Menu Button (Mobile Only) -->
+                <button 
+                    type="button"
+                    class="hamburger-menu-button"
+                    onclick={handleMobileMenuToggle}
+                    aria-label="Toggle menu"
+                    aria-expanded={showMobileMenu}>
+                    <lightning-icon 
+                        icon-name={hamburgerIconName}
+                        size="small"
+                        class="hamburger-icon">
+                    </lightning-icon>
+                </button>
+                <nav class="secondary-nav">
+                    <div class="secondary-nav__list">
+                        <a 
+                            role="button"
+                            tabindex="0"
+                            class={tabClassCourseManagement}
+                            data-tab="courseManagement"
+                            onclick={handleTabClick}
+                            onkeydown={handleTabClick}>
+                            Course Management
+                        </a>
+                        <span class="nav-separator">|</span>
+                        <a 
+                            role="button"
+                            tabindex="0"
+                            class={tabClassRosterUpload}
+                            data-tab="rosterUpload"
+                            onclick={handleTabClick}
+                            onkeydown={handleTabClick}>
+                            Roster Upload
+                        </a>
+                        <span class="nav-separator">|</span>
+                        <a 
+                            role="button"
+                            tabindex="0"
+                            class={tabClassSurveyFeedback}
+                            data-tab="surveyFeedback"
+                            onclick={handleTabClick}
+                            onkeydown={handleTabClick}>
+                            Survey Feedback
+                        </a>
+                        <span class="nav-separator">|</span>
+                        <a 
+                            role="button"
+                            tabindex="0"
+                            class={tabClassInstructorManagement}
+                            data-tab="instructorManagement"
+                            onclick={handleTabClick}
+                            onkeydown={handleTabClick}>
+                            Instructor Management
+                        </a>
+                    </div>
+                    <!-- Separator between nav and user info
+                    <div class="nav-user-separator"></div> -->
+                    <!-- User Info Section (Right Side - In Same Line) -->
+                    <div class="portal-header__right">
+                        <!-- Gear Icon - Navigate to Account Administration -->
+                        <button 
+                            type="button"
+                            class="gear-icon-button"
+                            onclick={handleGearClick}
+                            title="Account Administration"
+                            aria-label="Account Administration">
+                            <lightning-icon 
+                                icon-name="utility:settings" 
+                                size="small"
+                                class="gear-icon">
+                            </lightning-icon>
+                        </button>
+                        <!-- User Name with Dropdown -->
+                        <div class="user-menu-container">
+                            <button 
+                                type="button"
+                                class="user-name-button"
+                                onclick={handleUserNameClick}
+                                aria-label="User menu"
+                                aria-expanded={showUserMenu}>
+                                <span class="user-name">{userName}</span>
+                            </button>
+                            <!-- Dropdown Menu -->
+                            <template if:true={showUserMenu}>
+                                <div class="user-menu">
+                                    <button 
+                                        type="button"
+                                        class="user-menu-item"
+                                        onclick={handleLogout}>
+                                        Logout
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+            <!-- Mobile Menu (Hamburger Menu) -->
+            <template if:true={showMobileMenu}>
+                <div class="mobile-menu">
+                    <a 
+                        role="button"
+                        tabindex="0"
+                        class={tabClassCourseManagement}
+                        data-tab="courseManagement"
+                        onclick={handleMobileMenuClick}
+                        onkeydown={handleMobileMenuClick}>
+                        Course Management
+                    </a>
+                    <a 
+                        role="button"
+                        tabindex="0"
+                        class={tabClassRosterUpload}
+                        data-tab="rosterUpload"
+                        onclick={handleMobileMenuClick}
+                        onkeydown={handleMobileMenuClick}>
+                        Roster Upload
+                    </a>
+                    <a 
+                        role="button"
+                        tabindex="0"
+                        class={tabClassSurveyFeedback}
+                        data-tab="surveyFeedback"
+                        onclick={handleMobileMenuClick}
+                        onkeydown={handleMobileMenuClick}>
+                        Survey Feedback
+                    </a>
+                    <a 
+                        role="button"
+                        tabindex="0"
+                        class={tabClassInstructorManagement}
+                        data-tab="instructorManagement"
+                        onclick={handleMobileMenuClick}
+                        onkeydown={handleMobileMenuClick}>
+                        Instructor Management
+                    </a>
+                    <div class="mobile-menu-user-section">
+                        <button 
+                            type="button"
+                            class="mobile-gear-button"
+                            onclick={handleGearClick}
+                            title="Account Administration">
+                            <lightning-icon icon-name="utility:settings" size="small"></lightning-icon>
+                            <span>Settings</span>
+                        </button>
+                        <button 
+                            type="button"
+                            class="mobile-user-button"
+                            onclick={handleUserNameClick}>
+                            <span>{userName}</span>
+                        </button>
+                        <template if:true={showUserMenu}>
+                            <div class="mobile-user-menu">
+                                <button 
+                                    type="button"
+                                    class="mobile-user-menu-item"
+                                    onclick={handleLogout}>
+                                    Logout
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </header>
+
+        <!-- Content Area -->
+        <div class="content-wrapper">
+            <div class={showCourseManagementClass}>
+                <c-course-management-overview></c-course-management-overview>
+            </div>
+
+            <div class={showRosterUploadClass}>
+                <c-my-roster-upload></c-my-roster-upload>
+            </div>
+
+            <div class={showSurveyFeedbackClass}>
+                <c-ce-course-feedback-l-w-c></c-ce-course-feedback-l-w-c>
+            </div>
+
+            <div class={showInstructorManagementClass}>
+                <c-ce-instructor-management-l-w-c></c-ce-instructor-management-l-w-c>
+            </div>
+
+            <div class={showAccountAdministrationClass}>
+                <c-ce-account-administration></c-ce-account-administration>
+            </div>
+        </div>
+    </div>
+</template>

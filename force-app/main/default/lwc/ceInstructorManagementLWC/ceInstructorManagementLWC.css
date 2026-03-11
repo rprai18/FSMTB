@@ -1,0 +1,9 @@
+.section-title {
+    background:#366db5;
+    color:white;
+    padding:0.5rem;
+    border-radius:4px;
+    margin-bottom:0.75rem;
+    font-weight:600;
+}
+.instructions p { margin: 0.25rem 0; }

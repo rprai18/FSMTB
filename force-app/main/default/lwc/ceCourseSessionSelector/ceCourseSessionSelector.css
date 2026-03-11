@@ -1,0 +1,11 @@
+.slds-modal__header {
+    background: #f3f3f3;
+    border-bottom: 1px solid #d8dde6;
+}
+.slds-modal__footer {
+    background: #f3f3f3;
+    border-top: 1px solid #d8dde6;
+}
+lightning-combobox {
+    margin-bottom: 1rem;
+}

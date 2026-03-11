@@ -1,0 +1,129 @@
+// ============================================
+// VERIFY SUCCESSFUL UPDATES AND FIX FAILED ACCOUNTS
+// ============================================
+
+System.debug('========================================');
+System.debug('STEP 1: Verify Successfully Updated Accounts');
+System.debug('========================================');
+
+// Check accounts that were successfully updated
+List<Account> successfulAccounts = [
+    SELECT Id, Name, Membership_Status__c, Registration_Status__c,
+           Registration_Status_Flag__c, Survey_Total_Happy__c,
+           Membership_Expiration_Date__c
+    FROM Account 
+    WHERE RecordType.DeveloperName = 'CE_Provider'
+    AND Membership_Status__c != null
+    AND Registration_Status__c != null
+    LIMIT 10
+];
+
+System.debug('Found ' + successfulAccounts.size() + ' accounts with statuses populated:');
+System.debug('');
+
+Integer correctCount = 0;
+Integer totalCount = 0;
+
+for (Account acc : successfulAccounts) {
+    System.debug('Account: ' + acc.Name);
+    System.debug('  Membership Status: ' + acc.Membership_Status__c);
+    System.debug('  Registration Status: ' + acc.Registration_Status__c);
+    System.debug('  Registration Flag: ' + acc.Registration_Status_Flag__c);
+    System.debug('  Survey Total Happy: ' + acc.Survey_Total_Happy__c);
+    
+    // Verify Registration Status logic
+    if (acc.Survey_Total_Happy__c != null) {
+        totalCount++;
+        Boolean isCorrect = false;
+        
+        if (acc.Survey_Total_Happy__c >= 50) {
+            isCorrect = (acc.Registration_Status__c == 'Registered' && acc.Registration_Status_Flag__c == true);
+            System.debug('  ✅ Should be Registered: ' + (isCorrect ? 'CORRECT ✅' : 'INCORRECT ❌'));
+        } else {
+            isCorrect = (acc.Registration_Status__c == 'Provisional' && acc.Registration_Status_Flag__c == false);
+            System.debug('  ✅ Should be Provisional: ' + (isCorrect ? 'CORRECT ✅' : 'INCORRECT ❌'));
+        }
+        
+        if (isCorrect) correctCount++;
+    }
+    System.debug('');
+}
+
+System.debug('========================================');
+System.debug('VERIFICATION SUMMARY:');
+System.debug('  Accounts with statuses: ' + successfulAccounts.size());
+System.debug('  Correct Registration Status: ' + correctCount + ' out of ' + totalCount);
+System.debug('========================================');
+System.debug('');
+
+// ============================================
+// STEP 2: Fix Failed Accounts (with Website validation errors)
+// ============================================
+
+System.debug('========================================');
+System.debug('STEP 2: Update Failed Accounts (Skip Website Validation)');
+System.debug('========================================');
+
+// Get accounts that still need status calculation
+// Exclude accounts with invalid Website values (that cause validation errors)
+List<Account> failedAccounts = [
+    SELECT Id, Name, Website
+    FROM Account 
+    WHERE RecordType.DeveloperName = 'CE_Provider'
+    AND (Membership_Status__c = null OR Registration_Status__c = null)
+    AND (Website = null OR Website LIKE 'http://%' OR Website LIKE 'https://%')
+    LIMIT 200
+];
+
+System.debug('Found ' + failedAccounts.size() + ' accounts to update (with valid/null Website)');
+System.debug('');
+
+if (!failedAccounts.isEmpty()) {
+    // Use the migration handler which uses Database.update with allOrNone=false
+    List<Id> accountIds = new List<Id>();
+    for (Account acc : failedAccounts) {
+        accountIds.add(acc.Id);
+    }
+    
+    System.debug('Calling AccountTriggerHandler.recalculateAllAccountStatuses...');
+    System.debug('This will update accounts and calculate statuses');
+    System.debug('');
+    
+    // Use the static method in AccountTriggerHandler
+    AccountTriggerHandler.recalculateAllAccountStatuses(accountIds);
+    
+    System.debug('✅ Migration completed!');
+    System.debug('');
+    
+    // Verify results
+    List<Account> updatedAccounts = [
+        SELECT Name, Membership_Status__c, Registration_Status__c,
+               Registration_Status_Flag__c, Survey_Total_Happy__c
+        FROM Account 
+        WHERE Id IN :accountIds
+        LIMIT 10
+    ];
+    
+    System.debug('========================================');
+    System.debug('VERIFICATION - Updated Accounts:');
+    System.debug('========================================');
+    
+    for (Account acc : updatedAccounts) {
+        System.debug('Account: ' + acc.Name);
+        System.debug('  Membership Status: ' + acc.Membership_Status__c);
+        System.debug('  Registration Status: ' + acc.Registration_Status__c);
+        System.debug('  Survey Total Happy: ' + acc.Survey_Total_Happy__c);
+        
+        if (acc.Membership_Status__c != null && acc.Registration_Status__c != null) {
+            System.debug('  ✅ Statuses populated!');
+        } else {
+            System.debug('  ❌ Statuses still null');
+        }
+        System.debug('');
+    }
+}
+
+System.debug('========================================');
+System.debug('SCRIPT COMPLETED');
+System.debug('========================================');
+

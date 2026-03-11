@@ -1,0 +1,378 @@
+<template>
+    <div class="edit-course-container content-wrap">
+        <!-- Loading State -->
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+
+        <!-- Error State -->
+        <template if:true={error}>
+            <div class="slds-m-around_medium">
+                <lightning-icon icon-name="utility:error" size="small" class="slds-m-right_x-small"></lightning-icon>
+                <span>{error}</span>
+            </div>
+        </template>
+
+        <!-- Main Content -->
+        <template if:false={isLoading}>
+            <!-- Header Section -->
+            <div class="header-section">
+                <!-- <img src={headerImage0} alt="Header" class="header-section__image"/> -->
+                <h1 class="page-title">Edit Course - {courseName}</h1>
+            </div>
+
+            <!-- No Access Message -->
+            <template if:true={showNoAccessMessage}>
+                <div class="slds-box slds-theme_error slds-m-around_medium">
+                    <div class="slds-text-heading_medium slds-m-bottom_small">Access Denied</div>
+                    <p>
+                        This item has been denied or revoked by FSMTB. For more information, please contact 
+                        <a href="mailto:CE@fsmtb.org">CE@fsmtb.org</a>.
+                    </p>
+                    <div class="slds-m-top_medium">
+                        <lightning-button label="Ok" onclick={handleCancel} variant="brand"></lightning-button>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Course Information Form -->
+            <template if:false={showNoAccessMessage}>
+                <!-- Instructional Content -->
+                <template if:true={content}>
+                    <div class="content-section" lwc:dom="manual"></div>
+                </template>
+
+                <div class="form-section">
+                    <div class="slds-box slds-theme_default">
+                        <h2 class="slds-text-heading_medium slds-m-bottom_medium">Course Information</h2>
+                        
+                        <!-- Course Name -->
+                        <template if:false={isPublished}>
+                            <lightning-input
+                                label="Course Name"
+                                value={courseName}
+                                onchange={handleCourseNameChange}
+                                required="false">
+                            </lightning-input>
+                        </template>
+                        <template if:true={isPublished}>
+                            <div class="slds-form-element slds-m-bottom_small">
+                                <label class="slds-form-element__label">Course Name</label>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-form-element__static">{courseName}</div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Course ID -->
+                        <div class="slds-form-element slds-m-bottom_small">
+                            <label class="slds-form-element__label">Course ID</label>
+                            <div class="slds-form-element__control">
+                                <div class="slds-form-element__static">{courseIdText}</div>
+                            </div>
+                        </div>
+
+                        <!-- Category -->
+                        <template if:true={categoryText}>
+                            <div class="slds-form-element slds-m-bottom_small">
+                                <label class="slds-form-element__label">Category</label>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-form-element__static">{categoryText}</div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Course Objectives (only for new courses - Draft status) -->
+                        <template if:false={isPublished}>
+                            <lightning-input
+                                label="Course Objectives"
+                                value={courseSummary}
+                                onchange={handleCourseSummaryChange}
+                                max-length="500"
+                                required="true"
+                                class={courseSummaryErrorClass}>
+                            </lightning-input>
+                            <template if:true={displayCourseSummaryError}>
+                                <div class="slds-form-element__help slds-text-color_error">
+                                    Course Objectives cannot exceed 500 characters.
+                                </div>
+                            </template>
+                            <div class="slds-form-element__help">
+                                {courseSummaryLength}/500 characters
+                            </div>
+                        </template>
+
+                        <!-- Course Summary -->
+                        <template if:false={isPublished}>
+                            <lightning-textarea
+                                label="Course Summary"
+                                value={description}
+                                onchange={handleDescriptionChange}
+                                max-length="500"
+                                required="true">
+                            </lightning-textarea>
+                            <template if:true={displayDescriptionError}>
+                                <div class="slds-form-element__help slds-text-color_error">
+                                    Course Summary is required.
+                                </div>
+                            </template>
+                            <template if:true={displayDescriptionCountError}>
+                                <div class="slds-form-element__help slds-text-color_error">
+                                    Course Summary cannot exceed 500 characters.
+                                </div>
+                            </template>
+                            <div class="slds-form-element__help">
+                                {descriptionLength}/500 characters
+                            </div>
+                        </template>
+                        <template if:true={isPublished}>
+                            <div class="slds-form-element slds-m-bottom_small">
+                                <label class="slds-form-element__label">Course Summary</label>
+                                <div class="slds-form-element__control">
+                                    <div class="slds-form-element__static description-content" lwc:dom="manual"></div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <!-- Status -->
+                        <lightning-combobox
+                            label="Status"
+                            value={status}
+                            options={statusOptions}
+                            onchange={handleStatusChange}
+                            placeholder="Select Status">
+                        </lightning-combobox>
+
+                        <!-- Special Circumstances -->
+                        <lightning-textarea
+                            label="Special Circumstances"
+                            value={specialCircumstances}
+                            onchange={handleSpecialCircumstancesChange}
+                            placeholder="An exception to the General Provider Policies that applies to this course and all of its sessions.">
+                        </lightning-textarea>
+
+                        <!-- Registration Phone -->
+                        <lightning-input
+                            label="Registration Phone"
+                            value={registrationPhone}
+                            onchange={handleRegistrationPhoneChange}
+                            type="tel"
+                            required="true"
+                            class={registrationPhoneErrorClass}>
+                        </lightning-input>
+                        <template if:true={displayRegistrationPhoneError}>
+                            <div class="slds-form-element__help slds-text-color_error">
+                                A course registration contact telephone number is required.
+                            </div>
+                        </template>
+
+                        <!-- Registration Website -->
+                        <lightning-input
+                            label="Course Registration URL"
+                            value={registrationWebsite}
+                            onchange={handleRegistrationWebsiteChange}
+                            type="url">
+                        </lightning-input>
+
+                        <!-- Action Buttons -->
+                        <div class="slds-m-top_medium">
+                            <lightning-button
+                                label="Cancel"
+                                onclick={handleCancel}
+                                variant="neutral">
+                            </lightning-button>
+                            <lightning-button
+                                label="Publish Updates"
+                                onclick={handlePublishUpdates}
+                                variant="brand"
+                                class="slds-m-left_small">
+                            </lightning-button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sessions Section -->
+                <div class="sessions-section slds-m-top_large">
+                    <div class="slds-grid slds-grid_align-spread">
+                        <h2 class="slds-text-heading_medium">Sessions</h2>
+                        <lightning-button
+                            label="Add Session"
+                            onclick={handleAddSession}
+                            variant="brand">
+                        </lightning-button>
+                    </div>
+
+                    <!-- Published Sessions -->
+                    <template if:true={showPublishedSessions}>
+                        <div class="sessions-table-wrapper slds-m-top_medium">
+                            <h3 class="slds-text-heading_small slds-m-bottom_small">Published Sessions</h3>
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th scope="col">Actions</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Session ID</th>
+                                        <th scope="col">Session Type</th>
+                                        <th scope="col">Start Date</th>
+                                        <th scope="col">End Date</th>
+                                        <th scope="col">Cost</th>
+                                        <th scope="col">Instructor</th>
+                                        <th scope="col">Total Hours</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={publishedSessions} for:item="item">
+                                        <tr key={item.session.Id}>
+                                            <td data-label="Actions">
+                                                <template if:true={item.canEdit}>
+                                                    <a href="#" onclick={handleSessionAction} data-action="Edit" data-sessionid={item.session.Id} class="action-link">Edit</a>
+                                                    <span> | </span>
+                                                </template>
+                                                <a href="#" onclick={handleSessionAction} data-action="Copy" data-sessionid={item.session.Id} class="action-link">Copy</a>
+                                                <template if:true={item.canInactivate}>
+                                                    <span> | </span>
+                                                    <a href="#" onclick={handleSessionAction} data-action="Inactivate" data-sessionid={item.session.Id} class="action-link">Inactivate</a>
+                                                </template>
+                                            </td>
+                                            <td data-label="Status">{item.session.Status__c}</td>
+                                            <td data-label="Session ID">{item.session.Name}</td>
+                                            <td data-label="Session Type">{item.session.Session_Type__c}</td>
+                                            <td data-label="Start Date">{item.startDT}</td>
+                                            <td data-label="End Date">{item.endDT}</td>
+                                            <td data-label="Cost">{item.session.Cost__c}</td>
+                                            <td data-label="Instructor">{item.session.Instructor_Name__c}</td>
+                                            <td data-label="Total Hours">{item.session.Hours_Earned__c}</td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </template>
+
+                    <!-- Draft Sessions -->
+                    <template if:true={showDraftSessions}>
+                        <div class="sessions-table-wrapper slds-m-top_medium">
+                            <h3 class="slds-text-heading_small slds-m-bottom_small">Draft Sessions</h3>
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th scope="col">Actions</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Session ID</th>
+                                        <th scope="col">Session Type</th>
+                                        <th scope="col">Start Date</th>
+                                        <th scope="col">End Date</th>
+                                        <th scope="col">Cost</th>
+                                        <th scope="col">Instructor</th>
+                                        <th scope="col">Total Hours</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={draftSessions} for:item="item">
+                                        <tr key={item.session.Id}>
+                                            <td data-label="Actions">
+                                                <a href="#" onclick={handleSessionAction} data-action="Edit" data-sessionid={item.session.Id} class="action-link">Edit</a>
+                                                <span> | </span>
+                                                <a href="#" onclick={handleSessionAction} data-action="Copy" data-sessionid={item.session.Id} class="action-link">Copy</a>
+                                                <span> | </span>
+                                                <a href="#" onclick={handleSessionAction} data-action="Delete" data-sessionid={item.session.Id} class="action-link">Delete</a>
+                                            </td>
+                                            <td data-label="Status">{item.session.Status__c}</td>
+                                            <td data-label="Session ID">{item.session.Name}</td>
+                                            <td data-label="Session Type">{item.session.Session_Type__c}</td>
+                                            <td data-label="Start Date">{item.startDT}</td>
+                                            <td data-label="End Date">{item.endDT}</td>
+                                            <td data-label="Cost">{item.session.Cost__c}</td>
+                                            <td data-label="Instructor">{item.session.Instructor_Name__c}</td>
+                                            <td data-label="Total Hours">{item.session.Hours_Earned__c}</td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </template>
+
+                    <!-- Inactive Sessions -->
+                    <template if:true={showInactiveSessions}>
+                        <div class="sessions-table-wrapper slds-m-top_medium">
+                            <h3 class="slds-text-heading_small slds-m-bottom_small">Inactive Sessions</h3>
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th scope="col">Actions</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Session ID</th>
+                                        <th scope="col">Session Type</th>
+                                        <th scope="col">Start Date</th>
+                                        <th scope="col">End Date</th>
+                                        <th scope="col">Cost</th>
+                                        <th scope="col">Instructor</th>
+                                        <th scope="col">Total Hours</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={inactiveSessions} for:item="item">
+                                        <tr key={item.session.Id}>
+                                            <td data-label="Actions">
+                                                <template if:false={item.isRevoked}>
+                                                    <template if:true={item.isComplete}>
+                                                        <a href="#" onclick={handleSessionAction} data-action="Upload Roster" data-sessionid={item.session.Id} class="action-link">Upload Roster</a>
+                                                        <span> | </span>
+                                                    </template>
+                                                    <template if:true={item.isInactive}>
+                                                        <a href="#" onclick={handleSessionAction} data-action="Activate" data-sessionid={item.session.Id} class="action-link">Activate</a>
+                                                        <span> | </span>
+                                                    </template>
+                                                    <a href="#" onclick={handleSessionAction} data-action="Copy" data-sessionid={item.session.Id} class="action-link">Copy</a>
+                                                </template>
+                                            </td>
+                                            <td data-label="Status">{item.session.Status__c}</td>
+                                            <td data-label="Session ID">{item.session.Name}</td>
+                                            <td data-label="Session Type">{item.session.Session_Type__c}</td>
+                                            <td data-label="Start Date">{item.startDT}</td>
+                                            <td data-label="End Date">{item.endDT}</td>
+                                            <td data-label="Cost">{item.session.Cost__c}</td>
+                                            <td data-label="Instructor">{item.session.Instructor_Name__c}</td>
+                                            <td data-label="Total Hours">{item.session.Hours_Earned__c}</td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Last Active Session Confirmation Modal -->
+                <template if:true={showLastActiveSessionConfirmation}>
+                    <section role="dialog" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <header class="slds-modal__header">
+                                <h2 class="slds-text-heading_medium">Confirm Inactivation</h2>
+                            </header>
+                            <div class="slds-modal__content slds-p-around_medium">
+                                <p>
+                                    Courses require at least one active session to display on the FSMTB website. 
+                                    This is your last active session for this course, so the course will no longer 
+                                    display on the website if you inactivate.
+                                </p>
+                            </div>
+                            <footer class="slds-modal__footer">
+                                <lightning-button
+                                    label="Inactivate"
+                                    onclick={handleConfirmInactivate}
+                                    variant="brand">
+                                </lightning-button>
+                                <lightning-button
+                                    label="Do Not Inactivate"
+                                    onclick={closeConfirmation}
+                                    variant="neutral">
+                                </lightning-button>
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </template>
+            </template>
+        </template>
+    </div>
+</template>

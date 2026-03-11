@@ -1,0 +1,122 @@
+// ============================================
+// QUICK TEST SCRIPT - Use Existing Account
+// ============================================
+
+// Test 1: Find an existing account and check its status
+Account existingAcc = [SELECT Id, Name, Membership_Status__c, Registration_Status__c, 
+                              Registration_Status_Flag__c, Registration_Status_Date__c,
+                              Membership_Expiration_Date__c, Allow_Renewal__c,
+                              Survey_Total_Happy__c, RecordType.DeveloperName
+                       FROM Account 
+                       WHERE RecordType.DeveloperName IN ('CE_Provider', 'MT_Verify')
+                       LIMIT 1];
+
+System.debug('========================================');
+System.debug('TEST 1: Check Existing Account Status');
+System.debug('========================================');
+System.debug('Account Name: ' + existingAcc.Name);
+System.debug('Membership Status: ' + existingAcc.Membership_Status__c);
+System.debug('Registration Status: ' + existingAcc.Registration_Status__c);
+System.debug('Registration Status Flag: ' + existingAcc.Registration_Status_Flag__c);
+System.debug('Registration Status Date: ' + existingAcc.Registration_Status_Date__c);
+System.debug('Membership Expiration Date: ' + existingAcc.Membership_Expiration_Date__c);
+System.debug('Survey Total Happy: ' + existingAcc.Survey_Total_Happy__c);
+System.debug('========================================');
+
+// Test 2: Test Registration Status Update (Survey_Total_Happy__c is writable)
+// Update Survey_Total_Happy__c to 50 to test Registration Status
+existingAcc.Survey_Total_Happy__c = 50;
+update existingAcc;
+
+Account result2 = [SELECT Registration_Status__c, Registration_Status_Flag__c, Registration_Status_Date__c 
+                   FROM Account WHERE Id = :existingAcc.Id];
+System.debug('========================================');
+System.debug('TEST 2: Registration Status = Registered');
+System.debug('========================================');
+System.debug('Registration Status: ' + result2.Registration_Status__c); // Should be "Registered"
+System.debug('Registration Status Flag: ' + result2.Registration_Status_Flag__c); // Should be true
+System.debug('Registration Status Date: ' + result2.Registration_Status_Date__c); // Should be today
+System.debug('Test 2 Result: ' + (result2.Registration_Status__c == 'Registered' && result2.Registration_Status_Flag__c == true ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('========================================');
+
+// Test 3: Test Registration Status = Provisional
+existingAcc.Survey_Total_Happy__c = 49;
+update existingAcc;
+
+Account result3 = [SELECT Registration_Status__c, Registration_Status_Flag__c 
+                   FROM Account WHERE Id = :existingAcc.Id];
+System.debug('========================================');
+System.debug('TEST 3: Registration Status = Provisional');
+System.debug('========================================');
+System.debug('Registration Status: ' + result3.Registration_Status__c); // Should be "Provisional"
+System.debug('Registration Status Flag: ' + result3.Registration_Status_Flag__c); // Should be false
+System.debug('Test 3 Result: ' + (result3.Registration_Status__c == 'Provisional' && result3.Registration_Status_Flag__c == false ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('========================================');
+
+// Test 4: Test New Account Creation (without Membership_Expiration_Date__c)
+Account newAcc = new Account(
+    Name = 'Test Account - Status Test',
+    RecordTypeId = existingAcc.RecordTypeId // Use same record type
+    // Don't set Membership_Expiration_Date__c if it's not writable
+);
+insert newAcc;
+
+Account result4 = [SELECT Membership_Status__c, Registration_Status__c 
+                   FROM Account WHERE Id = :newAcc.Id];
+System.debug('========================================');
+System.debug('TEST 4: New Account Default Statuses');
+System.debug('========================================');
+System.debug('Membership Status: ' + result4.Membership_Status__c); // Should be "Active"
+System.debug('Registration Status: ' + result4.Registration_Status__c); // Should be "Provisional"
+System.debug('Test 4 Result: ' + (result4.Membership_Status__c == 'Active' && result4.Registration_Status__c == 'Provisional' ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('========================================');
+
+// Test 5: Test Provisional Action Prevention
+try {
+    CEActionController.submitAction(
+        existingAcc.Id, 
+        'Provisional', // This should be rejected
+        String.valueOf(System.today()), 
+        'Test reason'
+    );
+    System.debug('========================================');
+    System.debug('TEST 5: Provisional Action Prevention');
+    System.debug('========================================');
+    System.debug('Test 5 Result: FAIL ❌ (Should have thrown error)');
+} catch (Exception e) {
+    System.debug('========================================');
+    System.debug('TEST 5: Provisional Action Prevention');
+    System.debug('========================================');
+    System.debug('Error Message: ' + e.getMessage());
+    System.debug('Test 5 Result: ' + (e.getMessage().contains('Provisional') ? 'PASS ✅' : 'FAIL ❌'));
+}
+System.debug('========================================');
+
+// Test 6: Test Valid Action Creation
+try {
+    CEActionController.submitAction(
+        existingAcc.Id, 
+        'Under Review', // Valid action
+        String.valueOf(System.today()), 
+        'Test reason'
+    );
+    
+    Account result6 = [SELECT Current_Active_Action_Status__c FROM Account WHERE Id = :existingAcc.Id];
+    System.debug('========================================');
+    System.debug('TEST 6: Valid Action Creation');
+    System.debug('========================================');
+    System.debug('Action Status: ' + result6.Current_Active_Action_Status__c); // Should be "Under Review"
+    System.debug('Test 6 Result: ' + (result6.Current_Active_Action_Status__c == 'Under Review' ? 'PASS ✅' : 'FAIL ❌'));
+} catch (Exception e) {
+    System.debug('========================================');
+    System.debug('TEST 6: Valid Action Creation');
+    System.debug('========================================');
+    System.debug('Error: ' + e.getMessage());
+    System.debug('Test 6 Result: FAIL ❌');
+}
+System.debug('========================================');
+
+System.debug('========================================');
+System.debug('ALL TESTS COMPLETED');
+System.debug('========================================');
+

@@ -1,0 +1,52 @@
+.banner {
+    border-radius: 4px;
+    padding: 6px 12px;
+    margin: 6px 0;
+    color: #ffffff;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+/*** FSMTB Green - darker for icon visibility ***/
+.banner--green {
+    background: #1f6b32; /* FSMTB green - WCAG contrast-safe */
+}
+
+/*** FSMTB Yellow/Orange - brand color ***/
+.banner--orange {
+    background: #FFB81C; /* FSMTB yellow/orange brand color */
+}
+
+/*** Layout fixes - thinner, less obtrusive ***/
+.banner__inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/*** ICON BLOCK — FIX: Added min-width so it can't collapse ***/
+.banner__icon-group {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    min-width: 36px;
+    flex-shrink: 0;
+}
+
+/*** Icon styling ***/
+.icon-fix {
+    padding-top: 1px;
+}
+
+.banner__text {
+    flex: 1;
+    line-height: 1.4;
+    font-weight: 400;
+}
+
+@media (max-width: 420px) {
+    .banner {
+        font-size: 0.9rem;
+        padding: 6px 10px;
+    }
+}

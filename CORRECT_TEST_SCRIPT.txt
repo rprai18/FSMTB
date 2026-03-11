@@ -1,0 +1,209 @@
+// ============================================
+// CORRECTED TEST SCRIPT - Account Status Functionality
+// Note: Membership_Expiration_Date__c is a Roll-Up Summary field
+// We need to create/update Membership__c records to update it
+// ============================================
+
+// Test 1: Create New Account and verify default statuses
+Account testAcc = new Account(
+    Name = 'Test Account Status - ' + System.now(),
+    RecordTypeId = [SELECT Id FROM RecordType WHERE DeveloperName = 'CE_Provider' AND SobjectType = 'Account' LIMIT 1].Id
+);
+insert testAcc;
+
+Account result1 = [SELECT Membership_Status__c, Registration_Status__c, Registration_Status_Flag__c,
+                          Membership_Expiration_Date__c
+                   FROM Account WHERE Id = :testAcc.Id];
+
+System.debug('========================================');
+System.debug('TEST 1: New Account Default Statuses');
+System.debug('========================================');
+System.debug('Account Name: ' + testAcc.Name);
+System.debug('Membership Status: ' + result1.Membership_Status__c); // Should be "Active"
+System.debug('Registration Status: ' + result1.Registration_Status__c); // Should be "Provisional"
+System.debug('Registration Status Flag: ' + result1.Registration_Status_Flag__c); // Should be false
+System.debug('Membership Expiration Date: ' + result1.Membership_Expiration_Date__c); // May be null
+System.debug('Test 1 Result: ' + (result1.Membership_Status__c == 'Active' && result1.Registration_Status__c == 'Provisional' ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('========================================');
+
+// Test 2: Create Membership__c record to update Membership_Expiration_Date__c (Active membership)
+// First, check if Membership__c object exists and what fields it has
+try {
+    Membership__c membership = new Membership__c(
+        Account__c = testAcc.Id,
+        Expiration_Date__c = System.today().addDays(30), // Future date - should make status "Active"
+        Start_Date__c = System.today().addDays(-30),
+        Is_Current__c = true
+    );
+    insert membership;
+    
+    // Wait a moment for roll-up to recalculate (may need to query again)
+    Account result2 = [SELECT Membership_Status__c, Membership_Expiration_Date__c 
+                       FROM Account WHERE Id = :testAcc.Id];
+    
+    System.debug('========================================');
+    System.debug('TEST 2: Membership Status = Active (Future expiration)');
+    System.debug('========================================');
+    System.debug('Membership Expiration Date: ' + result2.Membership_Expiration_Date__c);
+    System.debug('Membership Status: ' + result2.Membership_Status__c); // Should be "Active"
+    System.debug('Test 2 Result: ' + (result2.Membership_Status__c == 'Active' ? 'PASS ✅' : 'FAIL ❌'));
+    System.debug('========================================');
+    
+    // Test 3: Update Membership__c to expired (Lapsed status)
+    membership.Expiration_Date__c = System.today().addDays(-10); // 10 days ago - should be "Lapsed"
+    update membership;
+    
+    // Query Account again to get updated roll-up value
+    Account result3 = [SELECT Membership_Status__c, Membership_Expiration_Date__c 
+                       FROM Account WHERE Id = :testAcc.Id];
+    
+    System.debug('========================================');
+    System.debug('TEST 3: Membership Status = Lapsed (Expired 10 days ago)');
+    System.debug('========================================');
+    System.debug('Membership Expiration Date: ' + result3.Membership_Expiration_Date__c);
+    System.debug('Membership Status: ' + result3.Membership_Status__c); // Should be "Lapsed"
+    System.debug('Test 3 Result: ' + (result3.Membership_Status__c == 'Lapsed' ? 'PASS ✅' : 'FAIL ❌'));
+    System.debug('========================================');
+    
+    // Test 4: Update Membership__c to expired 40 days ago (Inactive status)
+    membership.Expiration_Date__c = System.today().addDays(-40); // 40 days ago - should be "Inactive"
+    update membership;
+    
+    Account result4 = [SELECT Membership_Status__c FROM Account WHERE Id = :testAcc.Id];
+    
+    System.debug('========================================');
+    System.debug('TEST 4: Membership Status = Inactive (Expired 40 days ago)');
+    System.debug('========================================');
+    System.debug('Membership Status: ' + result4.Membership_Status__c); // Should be "Inactive"
+    System.debug('Test 4 Result: ' + (result4.Membership_Status__c == 'Inactive' ? 'PASS ✅' : 'FAIL ❌'));
+    System.debug('========================================');
+    
+    // Test 5: Update Membership__c to expired 70 days ago (Expired status)
+    membership.Expiration_Date__c = System.today().addDays(-70); // 70 days ago - should be "Expired"
+    update membership;
+    
+    Account result5 = [SELECT Membership_Status__c FROM Account WHERE Id = :testAcc.Id];
+    
+    System.debug('========================================');
+    System.debug('TEST 5: Membership Status = Expired (Expired 70 days ago)');
+    System.debug('========================================');
+    System.debug('Membership Status: ' + result5.Membership_Status__c); // Should be "Expired"
+    System.debug('Test 5 Result: ' + (result5.Membership_Status__c == 'Expired' ? 'PASS ✅' : 'FAIL ❌'));
+    System.debug('========================================');
+    
+    // Test 6: Set Allow_Renewal__c = true (Renewal status)
+    testAcc.Allow_Renewal__c = true;
+    update testAcc;
+    
+    Account result6 = [SELECT Membership_Status__c FROM Account WHERE Id = :testAcc.Id];
+    
+    System.debug('========================================');
+    System.debug('TEST 6: Membership Status = Renewal (Allow_Renewal__c = true)');
+    System.debug('========================================');
+    System.debug('Membership Status: ' + result6.Membership_Status__c); // Should be "Renewal"
+    System.debug('Test 6 Result: ' + (result6.Membership_Status__c == 'Renewal' ? 'PASS ✅' : 'FAIL ❌'));
+    System.debug('========================================');
+    
+} catch (Exception e) {
+    System.debug('========================================');
+    System.debug('ERROR: Membership__c object test failed');
+    System.debug('Error: ' + e.getMessage());
+    System.debug('Stack Trace: ' + e.getStackTraceString());
+    System.debug('Note: Membership__c may have different field names');
+    System.debug('========================================');
+}
+
+// Test 7: Test Registration Status = Registered (Survey = 50)
+testAcc.Survey_Total_Happy__c = 50;
+update testAcc;
+
+Account result7 = [SELECT Registration_Status__c, Registration_Status_Flag__c, Registration_Status_Date__c 
+                   FROM Account WHERE Id = :testAcc.Id];
+System.debug('========================================');
+System.debug('TEST 7: Registration Status = Registered (Survey = 50)');
+System.debug('========================================');
+System.debug('Registration Status: ' + result7.Registration_Status__c); // Should be "Registered"
+System.debug('Registration Status Flag: ' + result7.Registration_Status_Flag__c); // Should be true
+System.debug('Registration Status Date: ' + result7.Registration_Status_Date__c); // Should be today
+System.debug('Test 7 Result: ' + (result7.Registration_Status__c == 'Registered' && 
+                                   result7.Registration_Status_Flag__c == true && 
+                                   result7.Registration_Status_Date__c == System.today() ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('========================================');
+
+// Test 8: Test Registration Status = Provisional (Survey < 50)
+testAcc.Survey_Total_Happy__c = 49;
+update testAcc;
+
+Account result8 = [SELECT Registration_Status__c, Registration_Status_Flag__c 
+                   FROM Account WHERE Id = :testAcc.Id];
+System.debug('========================================');
+System.debug('TEST 8: Registration Status = Provisional (Survey = 49)');
+System.debug('========================================');
+System.debug('Registration Status: ' + result8.Registration_Status__c); // Should be "Provisional"
+System.debug('Registration Status Flag: ' + result8.Registration_Status_Flag__c); // Should be false
+System.debug('Test 8 Result: ' + (result8.Registration_Status__c == 'Provisional' && result8.Registration_Status_Flag__c == false ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('========================================');
+
+// Test 9: Test Provisional Action Prevention
+try {
+    CEActionController.submitAction(
+        testAcc.Id, 
+        'Provisional', // This should be rejected
+        String.valueOf(System.today()), 
+        'Test reason'
+    );
+    System.debug('========================================');
+    System.debug('TEST 9: Provisional Action Prevention');
+    System.debug('========================================');
+    System.debug('Test 9 Result: FAIL ❌ (Should have thrown error)');
+} catch (Exception e) {
+    System.debug('========================================');
+    System.debug('TEST 9: Provisional Action Prevention');
+    System.debug('========================================');
+    System.debug('Error Message: ' + e.getMessage());
+    System.debug('Test 9 Result: ' + (e.getMessage().contains('Provisional') ? 'PASS ✅' : 'FAIL ❌'));
+}
+System.debug('========================================');
+
+// Test 10: Test Valid Action Creation
+try {
+    CEActionController.submitAction(
+        testAcc.Id, 
+        'Under Review', // Valid action
+        String.valueOf(System.today()), 
+        'Test reason'
+    );
+    
+    Account result10 = [SELECT Current_Active_Action_Status__c FROM Account WHERE Id = :testAcc.Id];
+    System.debug('========================================');
+    System.debug('TEST 10: Valid Action Creation');
+    System.debug('========================================');
+    System.debug('Action Status: ' + result10.Current_Active_Action_Status__c); // Should be "Under Review"
+    System.debug('Test 10 Result: ' + (result10.Current_Active_Action_Status__c == 'Under Review' ? 'PASS ✅' : 'FAIL ❌'));
+} catch (Exception e) {
+    System.debug('========================================');
+    System.debug('TEST 10: Valid Action Creation');
+    System.debug('========================================');
+    System.debug('Error: ' + e.getMessage());
+    System.debug('Test 10 Result: FAIL ❌');
+}
+System.debug('========================================');
+
+// Test 11: Verify Available Actions (should not include Provisional)
+List<String> availableActions = CEActionController.getAvailableActions(testAcc.Id);
+System.debug('========================================');
+System.debug('TEST 11: Available Actions List');
+System.debug('========================================');
+System.debug('Available Actions: ' + availableActions);
+Boolean hasProvisional = availableActions.contains('Provisional') || 
+                         availableActions.contains('Provisional & Restricted') ||
+                         availableActions.contains('Provisional & Under Review') ||
+                         availableActions.contains('Provisional & Internal Investigation');
+System.debug('Contains Provisional actions: ' + hasProvisional);
+System.debug('Test 11 Result: ' + (!hasProvisional ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('========================================');
+
+System.debug('========================================');
+System.debug('ALL TESTS COMPLETED');
+System.debug('========================================');
+

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>SLB Portal Content (Router)</masterLabel>
+    <description>Shows Therapist Search, Reports, or Therapist Report based on the current URL. Use this on the same page as SLB Portal Container so the correct view always displays when navigating or using the back button.</description>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+</LightningComponentBundle>

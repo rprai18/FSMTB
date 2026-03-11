@@ -1,0 +1,112 @@
+/* Access Restricted LWC Styles */
+
+.content-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.access-restricted-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+}
+
+/* Page Header Styles */
+.page-header {
+    background-color: #f8f9fa;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+
+.page-header__content-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.page-header__image {
+    max-height: 100px;
+    width: auto;
+    object-fit: contain;
+}
+
+.page-header__heading {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    flex: 1;
+    min-width: 200px;
+}
+
+/* Restriction Message Styles */
+.restriction-message {
+    font-size: 1.1rem;
+    color: #333;
+    line-height: 1.8;
+    margin: 0;
+    padding: 1.5rem;
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 4px;
+    border-left: 4px solid #ffc107;
+}
+
+.email-link {
+    color: rgba(54, 110, 171);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.email-link:hover {
+    text-decoration: underline;
+    color: rgba(54, 110, 171);
+}
+
+.email-link:visited {
+    color: rgba(54, 110, 171);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .access-restricted-container {
+        padding: 1rem;
+        margin: 1rem auto;
+    }
+
+    .page-header__content-wrap {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .page-header__image {
+        max-height: 80px;
+    }
+
+    .page-header__heading {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    .restriction-message {
+        font-size: 1rem;
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header {
+        padding: 1rem 0;
+    }
+
+    .page-header__heading {
+        font-size: 1.25rem;
+    }
+
+    .restriction-message {
+        font-size: 0.95rem;
+    }
+}
+

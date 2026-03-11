@@ -1,0 +1,74 @@
+// ============================================
+// QUICK FIX: Make Banner Green RIGHT NOW
+// ============================================
+
+System.debug('========================================');
+System.debug('MAKING BANNER GREEN');
+System.debug('========================================');
+System.debug('');
+
+// Get current user's account
+User currentUser = [SELECT AccountId FROM User WHERE Id = :UserInfo.getUserId() LIMIT 1];
+
+if (currentUser.AccountId == null) {
+    System.debug('❌ No account found for current user');
+} else {
+    Account acc = [
+        SELECT Id, Name, 
+               Registration_Status__c, 
+               Current_Active_Action_Status__c
+        FROM Account 
+        WHERE Id = :currentUser.AccountId
+        LIMIT 1
+    ];
+    
+    System.debug('Account: ' + acc.Name);
+    System.debug('Current Registration Status: ' + acc.Registration_Status__c);
+    System.debug('Current Action Status: ' + acc.Current_Active_Action_Status__c);
+    System.debug('');
+    
+    // Update account to make banner green
+    Account accUpdate = new Account(Id = acc.Id);
+    
+    // Step 1: Clear Action Status (this will allow green to show)
+    if (acc.Current_Active_Action_Status__c != null) {
+        System.debug('Clearing Action Status...');
+        accUpdate.Current_Active_Action_Status__c = null;
+    }
+    
+    // Step 2: Ensure Registration Status is Provisional
+    if (acc.Registration_Status__c != 'Provisional') {
+        System.debug('Setting Registration Status to "Provisional"...');
+        accUpdate.Registration_Status__c = 'Provisional';
+    }
+    
+    // Update the account
+    try {
+        update accUpdate;
+        System.debug('');
+        System.debug('✅ Account updated!');
+        System.debug('');
+        System.debug('Banner should now be GREEN!');
+        System.debug('');
+        System.debug('Next steps:');
+        System.debug('1. Refresh the page in your browser');
+        System.debug('2. The banner should be GREEN now');
+    } catch (Exception e) {
+        System.debug('❌ Error updating account: ' + e.getMessage());
+    }
+}
+
+System.debug('');
+System.debug('========================================');
+System.debug('SCRIPT COMPLETED');
+System.debug('========================================');
+System.debug('');
+System.debug('Banner Color Logic:');
+System.debug('- GREEN: Registration Status = "Provisional" AND Action Status = null');
+System.debug('- ORANGE: Action Status exists (Under Review, Restricted, etc.)');
+System.debug('');
+System.debug('To see GREEN:');
+System.debug('1. Clear Action Status');
+System.debug('2. Ensure Registration Status = "Provisional"');
+System.debug('3. Refresh the page');
+

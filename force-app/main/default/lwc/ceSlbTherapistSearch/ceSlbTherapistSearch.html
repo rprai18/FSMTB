@@ -1,0 +1,218 @@
+<template>
+    <div class="slb-therapist-search-container">
+        <!-- Loading State -->
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+
+        <!-- Error State -->
+        <template if:true={error}>
+            <div class="slds-m-around_medium">
+                <lightning-icon icon-name="utility:error" size="small" class="slds-m-right_x-small"></lightning-icon>
+                <span>{error}</span>
+            </div>
+        </template>
+
+        <!-- Main Content -->
+        <template if:false={isLoading}>
+            <template if:false={error}>
+                <!-- Page Header with Title and Link -->
+                <div class="page-header">
+                    <div class="page-header__title-row">
+                        <h1 class="page-header__heading">Therapist Search</h1>
+                        <a href="#" class="participating-states-link" onclick={handleDialogTrigger}>Participating States</a>
+                    </div>
+                </div>
+
+                <!-- Search Form Section -->
+                <div class="search-form-section">
+                    <!-- Search Form -->
+                    <form class="therapist-search-form" onsubmit={handleSubmit}>
+                        <!-- Form Error Message -->
+                        <template if:true={showFormError}>
+                            <div class="form-error-message">
+                                <lightning-icon icon-name="utility:error" size="small" class="form-error-message__icon"></lightning-icon>
+                                <span class="form-error-message__text">{formError}</span>
+                            </div>
+                        </template>
+
+                        <!-- Search Fields Container -->
+                        <div class="search-fields-container">
+                            <!-- Search Term Field -->
+                            <div class="search-field">
+                                <label for="searchTerm" class="field-label">
+                                    SEARCH FOR NAMES AND/OR LICENSE NUMBERS
+                                </label>
+                                <div class="field-input-wrapper">
+                                    <lightning-input
+                                        type="text"
+                                        name="searchTerm"
+                                        value={searchTerm}
+                                        onchange={handleSearchTermChange}
+                                        placeholder="e.g., John Smith, License #12345"
+                                        class="search-input">
+                                    </lightning-input>
+                                </div>
+                            </div>
+
+                            <!-- Last Four SSN Field -->
+                            <div class="search-field">
+                                <label for="lastFourSSN" class="field-label">
+                                    SEARCH BY LAST FOUR DIGITS OF SSN
+                                </label>
+                                <div class="field-input-wrapper">
+                                    <lightning-input
+                                        type="text"
+                                        name="lastFourSSN"
+                                        value={lastFourSSN}
+                                        onchange={handleLastFourSSNChange}
+                                        placeholder="####"
+                                        pattern="[0-9]{4}"
+                                        message-when-pattern-mismatch="Must be 4 digits"
+                                        maxlength="4"
+                                        class="search-input">
+                                    </lightning-input>
+                                </div>
+                            </div>
+
+                            <!-- State Filter Field -->
+                            <div class="search-field">
+                                <label for="stateCodes" class="field-label">
+                                    FILTER BY STATE
+                                </label>
+                                <div class="field-input-wrapper">
+                                    <lightning-dual-listbox
+                                        name="stateCodes"
+                                        label="States"
+                                        variant="label-hidden"
+                                        source-label="Available States"
+                                        selected-label="Selected States"
+                                        options={stateOptions}
+                                        value={selectedStates}
+                                        onchange={handleStateChange}
+                                        min="0"
+                                        class="state-listbox">
+                                    </lightning-dual-listbox>
+                                    <div class="field-description">Leave blank to search all participating states.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="form-buttons">
+                            <lightning-button
+                                label="Clear"
+                                variant="neutral"
+                                onclick={handleClear}
+                                class="clear-button">
+                            </lightning-button>
+                            <lightning-button
+                                type="submit"
+                                label="Search"
+                                variant="brand"
+                                disabled={isSearchDisabled}
+                                class="search-button">
+                            </lightning-button>
+                            <template if:true={isSearching}>
+                                <lightning-spinner
+                                    alternative-text="Searching"
+                                    size="small"
+                                    class="search-spinner">
+                                </lightning-spinner>
+                            </template>
+                        </div>
+                    </form>
+
+                    <!-- Search Results -->
+                    <template if:true={showResults}>
+                        <div class="results-container">
+                            <h3 class="results-heading">Results</h3>
+                            <div class="results-content">
+                                <p class="results-description">
+                                    Therapists with multiple licenses will display a separate record for each license. 
+                                    Exam candidates (contacts without state licenses) are shown with blank License State and License Number fields.
+                                    Clicking "View" will show all records for that therapist.
+                                </p>
+                                
+                                <div class="results-count">
+                                    <p class="results-count-text">{resultsCountText}</p>
+                                </div>
+                                
+                                <div class="datatable-wrapper">
+                                    <lightning-datatable
+                                        key-field="id"
+                                        data={displayedResults}
+                                        columns={tableColumns}
+                                        hide-checkbox-column
+                                        onsort={handleSort}
+                                        sorted-by={sortedBy}
+                                        sorted-direction={sortedDirection}
+                                        enable-infinite-loading={enableInfiniteLoading}
+                                        onloadmore={handleLoadMore}
+                                        onrowaction={handleRowAction}
+                                        is-loading={isLoadingMore}
+                                        class="results-datatable">
+                                    </lightning-datatable>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- No Results -->
+                    <template if:true={showNoResults}>
+                        <div class="results-container">
+                            <h3 class="results-heading">Results</h3>
+                            <div class="results-content">
+                                <p class="no-results-message">Sorry, your search returned no results.</p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </template>
+
+        <!-- Participating States Modal -->
+        <template if:true={isStateDialogOpen}>
+            <section role="dialog" tabindex="-1" aria-modal="true" aria-labelledby="modal-heading-01" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <div class="modal-box">
+                        <header class="slds-modal__header">
+                            <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Participating States</h2>
+                        </header>
+                        <div class="slds-modal__content" id="modal-content-id-1">
+                            <p class="slds-m-bottom_medium">The following states &amp; territories are currently reporting data to MTLD:</p>
+                            <ul class="states-list slds-m-bottom_medium">
+                                <template for:each={geographicalRegions} for:item="state">
+                                    <li key={state} class="states-list__state">{state}</li>
+                                </template>
+                            </ul>
+                            <p class="slds-m-bottom_medium">
+                                If you are searching for information about a therapist who is licensed in a state other than those
+                                listed, please contact the state directly.
+                            </p>
+                            <div class="slds-m-top_medium">
+                                <lightning-input
+                                    type="checkbox"
+                                    data-id="donotdisplay"
+                                    label="Do Not Display Again"
+                                    checked={doNotDisplayAgain}
+                                    onchange={handleDoNotDisplayChange}
+                                    class="js-do-not-display">
+                                </lightning-input>
+                            </div>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning-button
+                                label="OK"
+                                variant="brand"
+                                onclick={handleDialogDismiss}
+                                class="js-dialog-dismiss">
+                            </lightning-button>
+                        </footer>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </div>
+</template>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Hands_On_On_Site_Hours__c</fullName>
+    <description>Percent of on-site hours that are hands on for this Professional Continuing Education record.</description>
+    <formula>Session__r.On_Site_Percentage_Hands_on__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <inlineHelpText>This field shows the percentage of hours that are hands on for this session for this record.</inlineHelpText>
+    <label>Hands On %</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Percent</type>
+</CustomField>

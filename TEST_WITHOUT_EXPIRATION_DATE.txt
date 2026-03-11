@@ -1,0 +1,145 @@
+// ============================================
+// TEST SCRIPT - Without Membership_Expiration_Date__c
+// ============================================
+// This script tests the functionality without setting Membership_Expiration_Date__c
+// which may be a formula field or not directly writable
+
+// Test 1: Create New Account (without expiration date field)
+Account newAcc = new Account(
+    Name = 'Test Account Status - ' + System.now(),
+    RecordTypeId = [SELECT Id FROM RecordType WHERE DeveloperName = 'CE_Provider' AND SobjectType = 'Account' LIMIT 1].Id
+    // Note: Membership_Expiration_Date__c is not set (may be formula or read-only)
+);
+insert newAcc;
+
+Account result1 = [SELECT Id, Name, Membership_Status__c, Registration_Status__c, 
+                          Registration_Status_Flag__c, Membership_Expiration_Date__c,
+                          Survey_Total_Happy__c
+                   FROM Account WHERE Id = :newAcc.Id];
+
+System.debug('========================================');
+System.debug('TEST 1: New Account Creation');
+System.debug('========================================');
+System.debug('Account Name: ' + result1.Name);
+System.debug('Membership Status: ' + result1.Membership_Status__c); // Should be "Active"
+System.debug('Registration Status: ' + result1.Registration_Status__c); // Should be "Provisional"
+System.debug('Registration Status Flag: ' + result1.Registration_Status_Flag__c); // Should be false
+System.debug('Membership Expiration Date: ' + result1.Membership_Expiration_Date__c);
+System.debug('Survey Total Happy: ' + result1.Survey_Total_Happy__c);
+System.debug('Test 1 Result: ' + (result1.Membership_Status__c == 'Active' && result1.Registration_Status__c == 'Provisional' ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('========================================');
+
+// Test 2: Test Registration Status Update (Survey_Total_Happy__c should be writable)
+result1.Survey_Total_Happy__c = 50;
+update result1;
+
+Account result2 = [SELECT Registration_Status__c, Registration_Status_Flag__c, Registration_Status_Date__c 
+                   FROM Account WHERE Id = :result1.Id];
+System.debug('========================================');
+System.debug('TEST 2: Registration Status = Registered (Survey = 50)');
+System.debug('========================================');
+System.debug('Registration Status: ' + result2.Registration_Status__c); // Should be "Registered"
+System.debug('Registration Status Flag: ' + result2.Registration_Status_Flag__c); // Should be true
+System.debug('Registration Status Date: ' + result2.Registration_Status_Date__c); // Should be today's date
+System.debug('Test 2 Result: ' + (result2.Registration_Status__c == 'Registered' && result2.Registration_Status_Flag__c == true && result2.Registration_Status_Date__c == System.today() ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('========================================');
+
+// Test 3: Test Registration Status = Provisional (Survey < 50)
+result1.Survey_Total_Happy__c = 49;
+update result1;
+
+Account result3 = [SELECT Registration_Status__c, Registration_Status_Flag__c 
+                   FROM Account WHERE Id = :result1.Id];
+System.debug('========================================');
+System.debug('TEST 3: Registration Status = Provisional (Survey = 49)');
+System.debug('========================================');
+System.debug('Registration Status: ' + result3.Registration_Status__c); // Should be "Provisional"
+System.debug('Registration Status Flag: ' + result3.Registration_Status_Flag__c); // Should be false
+System.debug('Test 3 Result: ' + (result3.Registration_Status__c == 'Provisional' && result3.Registration_Status_Flag__c == false ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('========================================');
+
+// Test 4: Test Allow_Renewal__c (if writable)
+try {
+    result1.Allow_Renewal__c = true;
+    update result1;
+    
+    Account result4 = [SELECT Membership_Status__c FROM Account WHERE Id = :result1.Id];
+    System.debug('========================================');
+    System.debug('TEST 4: Membership Status = Renewal (Allow_Renewal__c = true)');
+    System.debug('========================================');
+    System.debug('Membership Status: ' + result4.Membership_Status__c); // Should be "Renewal"
+    System.debug('Test 4 Result: ' + (result4.Membership_Status__c == 'Renewal' ? 'PASS ✅' : 'FAIL ❌'));
+    System.debug('========================================');
+} catch (Exception e) {
+    System.debug('========================================');
+    System.debug('TEST 4: Allow_Renewal__c Update');
+    System.debug('========================================');
+    System.debug('Error: ' + e.getMessage());
+    System.debug('Note: Allow_Renewal__c may not be writable');
+    System.debug('========================================');
+}
+
+// Test 5: Test Provisional Action Prevention
+try {
+    CEActionController.submitAction(
+        result1.Id, 
+        'Provisional', // This should be rejected
+        String.valueOf(System.today()), 
+        'Test reason'
+    );
+    System.debug('========================================');
+    System.debug('TEST 5: Provisional Action Prevention');
+    System.debug('========================================');
+    System.debug('Test 5 Result: FAIL ❌ (Should have thrown error)');
+} catch (Exception e) {
+    System.debug('========================================');
+    System.debug('TEST 5: Provisional Action Prevention');
+    System.debug('========================================');
+    System.debug('Error Message: ' + e.getMessage());
+    System.debug('Test 5 Result: ' + (e.getMessage().contains('Provisional') ? 'PASS ✅' : 'FAIL ❌'));
+    System.debug('========================================');
+}
+
+// Test 6: Test Valid Action Creation
+try {
+    CEActionController.submitAction(
+        result1.Id, 
+        'Under Review', // Valid action
+        String.valueOf(System.today()), 
+        'Test reason'
+    );
+    
+    Account result6 = [SELECT Current_Active_Action_Status__c FROM Account WHERE Id = :result1.Id];
+    System.debug('========================================');
+    System.debug('TEST 6: Valid Action Creation');
+    System.debug('========================================');
+    System.debug('Action Status: ' + result6.Current_Active_Action_Status__c); // Should be "Under Review"
+    System.debug('Test 6 Result: ' + (result6.Current_Active_Action_Status__c == 'Under Review' ? 'PASS ✅' : 'FAIL ❌'));
+    System.debug('========================================');
+} catch (Exception e) {
+    System.debug('========================================');
+    System.debug('TEST 6: Valid Action Creation');
+    System.debug('========================================');
+    System.debug('Error: ' + e.getMessage());
+    System.debug('Test 6 Result: FAIL ❌');
+    System.debug('========================================');
+}
+
+// Test 7: Verify Available Actions (should not include Provisional)
+List<String> availableActions = CEActionController.getAvailableActions(result1.Id);
+System.debug('========================================');
+System.debug('TEST 7: Available Actions List');
+System.debug('========================================');
+System.debug('Available Actions: ' + availableActions);
+Boolean hasProvisional = availableActions.contains('Provisional') || 
+                         availableActions.contains('Provisional & Restricted') ||
+                         availableActions.contains('Provisional & Under Review') ||
+                         availableActions.contains('Provisional & Internal Investigation');
+System.debug('Contains Provisional actions: ' + hasProvisional);
+System.debug('Test 7 Result: ' + (!hasProvisional ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('========================================');
+
+System.debug('========================================');
+System.debug('ALL TESTS COMPLETED');
+System.debug('========================================');
+

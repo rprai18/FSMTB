@@ -1,0 +1,710 @@
+<template>
+    <div class="account-administration-container content-wrap">
+        <!-- Renewal Popup Modal -->
+        <template if:true={showRenewalPopup}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aria-labelledby="renewal-popup-heading" aria-modal="true">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="renewal-popup-heading" class="slds-modal__title slds-hyphenate">
+                            <lightning-icon icon-name="utility:warning" alternative-text="Warning" size="small" variant="error" class="slds-m-right_small"></lightning-icon>
+                            Account Expiration Notice
+                        </h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <p>Your account is going to expire in {renewalDaysRemaining} day(s). Do you wish to renew now?</p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Not Now" onclick={handleRenewalPopupNotNow} variant="neutral"></lightning-button>
+                        <lightning-button label="Renew" onclick={handleRenewalPopupRenew} variant="brand" class="slds-m-left_small"></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- Loading State -->
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+
+        <!-- Error State -->
+        <template if:true={error}>
+            <div class="slds-m-around_medium">
+                <lightning-icon icon-name="utility:error" size="small" class="slds-m-right_x-small"></lightning-icon>
+                <span>{error}</span>
+            </div>
+        </template>
+
+        <!-- Main Content -->
+        <template if:false={isLoading}>
+            <!-- Header Section (no banner on SLB) -->
+            <div class={headerSectionClass}>
+                <h1 class="page-title">Account Administration</h1>
+            </div>
+
+            <!-- Action Banner Component -->
+            <template if:true={accountId}>
+                <c-ce-action-banner 
+                    record-id={accountId}
+                    status-field-api-name="Current_Active_Action_Status__c">
+                </c-ce-action-banner>
+            </template>
+
+            <!-- Resource Link Section: SLB-specific text when on SLB portal; CE/other community text otherwise (code kept for all communities) -->
+            <div class="content-section">
+                <template if:true={isSlbPortal}>
+                    <p>
+                        Manage your SLB portal users here. Your account has a user limit (SLB Max Portal Users). You can add, edit, and remove users up to that limit. For SLB portal support, contact FSMTB at <a href="mailto:mtld@fsmtb.org" style="color: rgba(54, 110, 171)">mtld@fsmtb.org</a>.
+                    </p>
+                </template>
+                <template if:false={isSlbPortal}>
+                    <p>
+                        To learn more about how to use CE Registry, review our technology resource. This resource includes comprehensive step-by-step instructions for accessing and using CE Registry. It includes screenshots and detailed definitions of every aspect of using the program. 
+                        <a href="https://fsmtb.file.force.com/servlet/servlet.FileDownload?file=015VU000005a3UN" target="_blank" style="color: rgba(54, 110, 171)">Click here</a> to read at your own pace.
+                    </p>
+                </template>
+            </div>
+
+            <!-- User Management Section -->
+            <div class="section-wrapper">
+                <!-- General Provider Policies (hidden for SLB portal only; shown for other communities) -->
+                <template if:false={isSlbPortal}>
+                    <div class="policies-section">
+                        <div class="policies-right">
+                            <lightning-button
+                                label="Edit General Provider Policies"
+                                variant="base"
+                                onclick={handleEditGeneralPolicies}
+                                class="policies-btn">
+                            </lightning-button>
+                            <div class="policies-description">
+                                Update cancellation, ADA, grievance, and conflict of interest policies.
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <div class="section-header">
+                    <h2>User Management</h2>
+                    <div class="section-header-right">
+                        <div class="users-used-note" lwc:dom="manual"></div>
+                        <lightning-button
+                            label="Add"
+                            variant="brand"
+                            onclick={handleAddUser}
+                            disabled={cannotAddUser}>
+                        </lightning-button>
+                    </div>
+                </div>
+
+                <!-- Active Users Table -->
+                <div class="slds-box slds-theme_default user-management-table">
+                    <h3 class="slds-text-heading_small slds-m-bottom_medium">Active Users</h3>
+                    <template if:true={activeUsers}>
+                        <template if:true={activeUsers.length}>
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th scope="col">Username</th>
+                                        <th scope="col">First Name</th>
+                                        <th scope="col">Last Name</th>
+                                        <th scope="col">Email</th>
+                                        <th scope="col">Title</th>
+                                        <th scope="col">Phone</th>
+                                        <th scope="col">Permissions</th>
+                                        <!-- CE Registry Alert column: hidden for SLB portal only -->
+                                        <template if:false={isSlbPortal}><th scope="col">CE Registry Alert</th></template>
+                                        <th scope="col">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={activeUsers} for:item="user">
+                                        <tr key={user.id}>
+                                            <td>{user.username}</td>
+                                            <td>{user.firstName}</td>
+                                            <td>{user.lastName}</td>
+                                            <td><a href="mailto:{user.email}">{user.email}</a></td>
+                                            <td>{user.title}</td>
+                                            <td>{user.phone}</td>
+                                            <td>{user.profileName}</td>
+                                            <template if:false={isSlbPortal}>
+                                                <td>
+                                                    <template if:true={user.ceRegistryAlert}>
+                                                        <lightning-icon icon-name="utility:check" size="small" class="slds-icon-text-success"></lightning-icon>
+                                                    </template>
+                                                </td>
+                                            </template>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <template if:false={user.isPortalOwner}>
+                                                        <lightning-button-icon
+                                                            icon-name="utility:edit"
+                                                            alternative-text="Edit"
+                                                            title="Edit"
+                                                            data-userid={user.id}
+                                                            onclick={handleEditUser}
+                                                            variant="border-filled"
+                                                            class="slds-m-right_x-small">
+                                                        </lightning-button-icon>
+                                                    </template>
+                                                    <lightning-button-icon
+                                                        icon-name="utility:reset_password"
+                                                        alternative-text="Reset Password"
+                                                        title="Reset Password"
+                                                        data-userid={user.id}
+                                                        onclick={handleResetPassword}
+                                                        variant="border-filled">
+                                                    </lightning-button-icon>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </template>
+                        <template if:false={activeUsers.length}>
+                            <p>No active users found.</p>
+                        </template>
+                    </template>
+                </div>
+
+                <!-- Inactive Users Table -->
+                <template if:true={inactiveUsers}>
+                    <template if:true={inactiveUsers.length}>
+                        <div class="slds-box slds-theme_default slds-m-top_medium user-management-table">
+                            <h3 class="slds-text-heading_small slds-m-bottom_medium">Inactive Users</h3>
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_striped">
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th scope="col">Username</th>
+                                        <th scope="col">First Name</th>
+                                        <th scope="col">Last Name</th>
+                                        <th scope="col">Email</th>
+                                        <th scope="col">Title</th>
+                                        <th scope="col">Phone</th>
+                                        <th scope="col">Permissions</th>
+                                        <th scope="col">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template for:each={inactiveUsers} for:item="user">
+                                        <tr key={user.id}>
+                                            <td>{user.username}</td>
+                                            <td>{user.firstName}</td>
+                                            <td>{user.lastName}</td>
+                                            <td><a href="mailto:{user.email}">{user.email}</a></td>
+                                            <td>{user.title}</td>
+                                            <td>{user.phone}</td>
+                                            <td>{user.profileName}</td>
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <lightning-button-icon
+                                                        icon-name="utility:edit"
+                                                        alternative-text="Edit"
+                                                        title="Edit"
+                                                        data-userid={user.id}
+                                                        onclick={handleEditUser}
+                                                        variant="border-filled"
+                                                        class="slds-m-right_x-small">
+                                                    </lightning-button-icon>
+                                                    <lightning-button-icon
+                                                        icon-name="utility:delete"
+                                                        alternative-text="Remove"
+                                                        title="Remove"
+                                                        data-userid={user.id}
+                                                        onclick={handleRemoveUser}
+                                                        variant="border-filled">
+                                                    </lightning-button-icon>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </template>
+                </template>
+            </div>
+
+            <!-- Subscription Plan: hidden for SLB portal only; shown for other communities -->
+            <template if:false={isSlbPortal}>
+            <div class="section-wrapper slds-m-top_medium">
+                <div class="section-header">
+                    <h2>Subscription Plan</h2>
+                    <div class="section-header-right">
+                        <template if:true={showRenewButton}>
+                            <lightning-button
+                                label="Renew"
+                                variant="brand"
+                                onclick={handleRenewMembership}>
+                            </lightning-button>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Show renewal message when no current membership -->
+                <template if:true={showRenewalMessage}>
+                    <div class="slds-box slds-theme_default">
+                        <p>{renewalMessage}</p>
+                    </div>
+                </template>
+
+                <template if:true={hasCurrentMembership}>
+                    <div class="slds-box slds-theme_default">
+                        <div class="slds-grid slds-gutters">
+                            <div class="slds-col">
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label"><strong>Current Plan:</strong></label>
+                                    <div class="slds-form-element__control">
+                                        <template if:true={currentMembership.Start_Date__c}>
+                                            <div><strong>Start Date:</strong> {currentMembershipStartDate}</div>
+                                        </template>
+                                        <template if:true={currentMembership.Expiration_Date__c}>
+                                            <div><strong>Expiration Date:</strong> {currentMembershipExpirationDate}</div>
+                                        </template>
+                                        <template if:true={currentMembership.Cost__c}>
+                                            <div><strong>Cost:</strong> {currentMembershipCost}</div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                            <template if:true={hasNextMembership}>
+                                <div class="slds-col">
+                                    <div class="slds-form-element">
+                                        <label class="slds-form-element__label"><strong>Upcoming Plan:</strong></label>
+                                        <div class="slds-form-element__control">
+                                            <template if:true={nextMembership.Start_Date__c}>
+                                                <div><strong>Start Date:</strong> {nextMembershipStartDate}</div>
+                                            </template>
+                                            <template if:true={nextMembership.Expiration_Date__c}>
+                                                <div><strong>Expiration Date:</strong> {nextMembershipExpirationDate}</div>
+                                            </template>
+                                            <template if:true={nextMembership.Cost__c}>
+                                                <div><strong>Cost:</strong> {nextMembershipCost}</div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            </template>
+
+            <!-- Purchased Survey Feedback: hidden for SLB portal only; shown for other communities -->
+            <template if:false={isSlbPortal}>
+            <div class="section-wrapper slds-m-top_medium">
+                <div class="section-header">
+                    <h2>Purchased Survey Feedback</h2>
+                    <div class="section-header-right">
+                        <lightning-button
+                            label="Go"
+                            variant="brand"
+                            onclick={handlePurchasedSurveyRedirect}>
+                        </lightning-button>
+                    </div>
+                </div>
+                <div class="slds-box slds-theme_default">
+                    <p>Access your purchased survey feedback reports.</p>
+                </div>
+            </div>
+            </template>
+
+            <!-- Account Contact Information: hidden for SLB portal only; shown for other communities -->
+            <template if:false={isSlbPortal}>
+            <div class="section-wrapper slds-m-top_medium">
+                <div class="section-header">
+                    <h2>Account Contact Information</h2>
+                    <div class="section-header-right">
+                        <lightning-button
+                            label="Update"
+                            variant="brand"
+                            onclick={handleUpdateAccount}>
+                        </lightning-button>
+                    </div>
+                </div>
+
+                <div class="slds-box slds-theme_default">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Business Name</label>
+                        <div class="slds-form-element__control">{accountName}</div>
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Business Website</label>
+                        <div class="slds-form-element__control">{accountWebsite}</div>
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Business Email <span class="slds-text-color_error">*</span></label>
+                        <div class="slds-form-element__control">{accountEmail}</div>
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Street <span class="slds-text-color_error">*</span></label>
+                        <div class="slds-form-element__control">{accountStreet}</div>
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">City <span class="slds-text-color_error">*</span></label>
+                        <div class="slds-form-element__control">{accountCity}</div>
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">State <span class="slds-text-color_error">*</span></label>
+                        <div class="slds-form-element__control">{account.State}</div>
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Zip Code <span class="slds-text-color_error">*</span></label>
+                        <div class="slds-form-element__control">{accountPostalCode}</div>
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Business Phone <span class="slds-text-color_error">*</span></label>
+                        <div class="slds-form-element__control">{accountPhone}</div>
+                    </div>
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label">Business Fax</label>
+                        <div class="slds-form-element__control">{accountFax}</div>
+                    </div>
+                </div>
+            </div>
+            </template>
+        </template>
+
+        <!-- User Modal -->
+        <template if:true={showUserModal}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-labelledby="user-modal-heading" aria-modal="true">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="user-modal-heading" class="slds-modal__title slds-hyphenate">
+                            <template if:true={isNewUser}>Add User</template>
+                            <template if:false={isNewUser}>Edit User</template>
+                        </h2>
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeAllModals}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" size="small"></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <!-- Content -->
+                        <template if:true={isNewUser}>
+                            <div class="content-add-user" lwc:dom="manual"></div>
+                        </template>
+                        <template if:false={isNewUser}>
+                            <div class="content-edit-user" lwc:dom="manual"></div>
+                        </template>
+
+                        <!-- User Form -->
+                        <div class="slds-box slds-theme_default">
+                            <lightning-input
+                                label="First Name"
+                                value={userFirstName}
+                                onchange={handleUserFirstNameChange}
+                                required="true">
+                            </lightning-input>
+                            <template if:true={displayFirstNameError}>
+                                <div class="slds-form-element__help slds-text-color_error slds-m-top_x-small">First name is required.</div>
+                            </template>
+
+                            <lightning-input
+                                label="Last Name"
+                                value={userLastName}
+                                onchange={handleUserLastNameChange}
+                                required="true"
+                                class="slds-m-top_small">
+                            </lightning-input>
+                            <template if:true={displayLastNameError}>
+                                <div class="slds-form-element__help slds-text-color_error">Last name is required.</div>
+                            </template>
+
+                            <template if:true={isNewUser}>
+                                <lightning-input
+                                    label="Username"
+                                    value={userUsername}
+                                    onchange={handleUserUsernameChange}
+                                    required="true"
+                                    placeholder={usernamePlaceholder}
+                                    class="slds-m-top_small">
+                                </lightning-input>
+                            </template>
+                            <template if:false={isNewUser}>
+                                <div class="slds-form-element slds-m-top_small">
+                                    <label class="slds-form-element__label">Username</label>
+                                    <div class="slds-form-element__control">{modifyingUsername}</div>
+                                </div>
+                            </template>
+                            <template if:true={displayUsernameError}>
+                                <div class="slds-form-element__help slds-text-color_error">Username is required.</div>
+                            </template>
+                            <template if:true={displayUsernameUsedError}>
+                                <div class="slds-form-element__help slds-text-color_error">Username is already being used. Please enter a different username.</div>
+                            </template>
+                            <template if:true={displayUsernameFormatError}>
+                                <div class="slds-form-element__help slds-text-color_error">
+                                    <template if:true={isCERegistry}>Username cannot be formatted as an email address.</template>
+                                    <template if:false={isCERegistry}>Username is not formatted as an email address.</template>
+                                </div>
+                            </template>
+
+                            <lightning-input
+                                label="Email"
+                                value={userEmail}
+                                onchange={handleUserEmailChange}
+                                type="email"
+                                required="true"
+                                class="slds-m-top_small">
+                            </lightning-input>
+                            <template if:true={displayEmailError}>
+                                <div class="slds-form-element__help slds-text-color_error">Active email is required and must be formatted as an email address.</div>
+                            </template>
+
+                            <lightning-input
+                                label="Phone"
+                                value={userPhone}
+                                onchange={handleUserPhoneChange}
+                                type="tel"
+                                placeholder="###-###-####"
+                                required="true"
+                                class="slds-m-top_small">
+                            </lightning-input>
+                            <template if:true={displayPhoneError}>
+                                <div class="slds-form-element__help slds-text-color_error">Telephone number is required.</div>
+                            </template>
+
+                            <lightning-input
+                                label="Title"
+                                value={userTitle}
+                                onchange={handleUserTitleChange}
+                                class="slds-m-top_small">
+                            </lightning-input>
+
+                            <template if:true={isEditUserDisabled}>
+                                <div class="slds-form-element slds-m-top_small">
+                                    <label class="slds-form-element__label">Permissions</label>
+                                    <div class="slds-form-element__control">CE Registry Owner</div>
+                                </div>
+                            </template>
+                            <template if:false={isEditUserDisabled}>
+                                <lightning-combobox
+                                    label="Permissions"
+                                    value={selectedProfileId}
+                                    options={profileOptions}
+                                    onchange={handleProfileChange}
+                                    required="true"
+                                    class="slds-m-top_small">
+                                </lightning-combobox>
+                            </template>
+
+                            <!-- Email Preferences & CE Registry Alert: hidden for SLB portal only; shown for other communities -->
+                            <template if:true={showRosterEmailCheckboxComputed}>
+                                <div class="slds-form-element slds-m-top_small">
+                                    <div class="email-preferences-header">Email Preferences</div>
+                                    <lightning-input
+                                        type="checkbox"
+                                        label="CE Registry Alert"
+                                        checked={ceRegistryAlert}
+                                    onchange={handleCeRegistryAlertChange}
+                                    disabled={isEditUserDisabled}>
+                                    </lightning-input>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Cancel" onclick={closeAllModals} variant="neutral"></lightning-button>
+                        <lightning-button label="Save" onclick={handleSaveUser} variant="brand" class="slds-m-left_small"></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- Inactivate User Confirmation Modal -->
+        <template if:true={showInactivateModal}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aria-labelledby="inactivate-modal-heading" aria-modal="true">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="inactivate-modal-heading" class="slds-modal__title slds-hyphenate">Confirm Inactivation</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <p>Please confirm you would like to inactivate the user "{modifyingUsername}".</p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Do Not Inactivate" onclick={closeAllModals} variant="neutral"></lightning-button>
+                        <lightning-button label="Inactivate" onclick={handleInactivateConfirm} variant="brand" class="slds-m-left_small"></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- Activate User Confirmation Modal -->
+        <template if:true={showActivateModal}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aria-labelledby="activate-modal-heading" aria-modal="true">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="activate-modal-heading" class="slds-modal__title slds-hyphenate">Confirm Activation</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <p>Please confirm you would like to activate the user "{modifyingUsername}".</p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Do Not Activate" onclick={closeAllModals} variant="neutral"></lightning-button>
+                        <lightning-button label="Activate" onclick={handleActivateConfirm} variant="brand" class="slds-m-left_small"></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- Remove User Confirmation Modal -->
+        <template if:true={showRemoveModal}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aria-labelledby="remove-modal-heading" aria-modal="true">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="remove-modal-heading" class="slds-modal__title slds-hyphenate">Confirm Removal</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <p>Please confirm you would like to permanently remove the user "{modifyingUsername}".</p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Do Not Remove" onclick={closeAllModals} variant="neutral"></lightning-button>
+                        <lightning-button label="Remove" onclick={handleRemoveConfirm} variant="brand" class="slds-m-left_small"></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- Reset Password Confirmation Modal -->
+        <template if:true={showResetPasswordModal}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open" aria-labelledby="reset-modal-heading" aria-modal="true">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="reset-modal-heading" class="slds-modal__title slds-hyphenate">Confirm Password Reset</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <p>Please confirm you would like to reset the password for the user "{modifyingUsername}".</p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Do Not Reset" onclick={closeAllModals} variant="neutral"></lightning-button>
+                        <lightning-button label="Reset" onclick={handleResetPasswordConfirm} variant="brand" class="slds-m-left_small"></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+
+        <!-- Update Account Modal -->
+        <template if:true={showUpdateAccountModal}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-labelledby="update-account-modal-heading" aria-modal="true">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h2 id="update-account-modal-heading" class="slds-modal__title slds-hyphenate">Update Account</h2>
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeAllModals}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" size="small"></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <div class="content-update-account" lwc:dom="manual"></div>
+
+                        <div class="slds-box slds-theme_default">
+                            <lightning-input
+                                label="Business Name"
+                                value={accountName}
+                                disabled="true">
+                            </lightning-input>
+
+                            <lightning-input
+                                label="Business Email"
+                                value={accountEmail}
+                                onchange={handleAccountEmailChange}
+                                type="email"
+                                required="true"
+                                class="slds-m-top_small">
+                            </lightning-input>
+                            <template if:true={displayBusinessEmailError}>
+                                <div class="slds-form-element__help slds-text-color_error">Active email is required and must be formatted as an email address.</div>
+                            </template>
+
+                            <lightning-input
+                                label="Street"
+                                value={accountStreet}
+                                onchange={handleAccountStreetChange}
+                                required="true"
+                                class="slds-m-top_small">
+                            </lightning-input>
+                            <template if:true={displayStreetError}>
+                                <div class="slds-form-element__help slds-text-color_error">Address is required.</div>
+                            </template>
+
+                            <lightning-input
+                                label="City"
+                                value={accountCity}
+                                onchange={handleAccountCityChange}
+                                required="true"
+                                class="slds-m-top_small">
+                            </lightning-input>
+                            <template if:true={displayCityError}>
+                                <div class="slds-form-element__help slds-text-color_error">City is required.</div>
+                            </template>
+
+                            <lightning-combobox
+                                label="State"
+                                value={accountState}
+                                options={statePicklist}
+                                onchange={handleAccountStateChange}
+                                required="true"
+                                class="slds-m-top_small">
+                            </lightning-combobox>
+
+                            <lightning-input
+                                label="Zip Code"
+                                value={accountPostalCode}
+                                onchange={handleAccountPostalCodeChange}
+                                required="true"
+                                class="slds-m-top_small">
+                            </lightning-input>
+                            <template if:true={displayPostalCodeError}>
+                                <div class="slds-form-element__help slds-text-color_error">Zip code is required.</div>
+                            </template>
+
+                            <lightning-input
+                                label="Business Phone"
+                                value={accountPhone}
+                                onchange={handleAccountPhoneChange}
+                                type="tel"
+                                required="true"
+                                placeholder="###-###-####"
+                                class="slds-m-top_small">
+                            </lightning-input>
+                            <template if:true={displayBusinessPhoneError}>
+                                <div class="slds-form-element__help slds-text-color_error">Telephone number is required.</div>
+                            </template>
+
+                            <lightning-input
+                                label="Business Fax"
+                                value={accountFax}
+                                onchange={handleAccountFaxChange}
+                                type="tel"
+                                placeholder="###-###-####"
+                                class="slds-m-top_small">
+                            </lightning-input>
+
+                            <lightning-input
+                                label="Business Website"
+                                value={accountWebsite}
+                                onchange={handleAccountWebsiteChange}
+                                type="url"
+                                placeholder="http://www.website.com"
+                                class="slds-m-top_small">
+                            </lightning-input>
+                        </div>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Do Not Update" onclick={closeAllModals} variant="neutral"></lightning-button>
+                        <lightning-button label="Update" onclick={handleSaveAccount} variant="brand" class="slds-m-left_small"></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </div>
+</template>

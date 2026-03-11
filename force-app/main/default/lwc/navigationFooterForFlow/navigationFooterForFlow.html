@@ -1,0 +1,22 @@
+<template>
+    <div class="footer-container">
+        <lightning-button
+            label="Cancel"
+            onclick={handleCancel}
+            class="slds-m-right_small"
+        ></lightning-button>
+
+        <lightning-button
+            label="Save as Draft"
+            variant="neutral"
+            onclick={handleSaveDraft}
+            class="slds-m-right_small"
+        ></lightning-button>
+
+        <lightning-button
+            label="Submit"
+            variant="brand"
+            onclick={handleSubmit}
+        ></lightning-button>
+    </div>
+</template>

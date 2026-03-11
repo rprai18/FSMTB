@@ -1,0 +1,48 @@
+<template>
+    <header class="slb-header">
+        <!-- Main header row -->
+        <div class="slb-headerRow slds-grid slds-grid_vertical-align-center slds-wrap">
+            <!-- Left -->
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                <div class="slds-grid slds-grid_vertical-align-center">
+                    <button class="slds-button slds-button_icon" onclick={openHomePage}>
+                        <img src={logoUrl} alt="FSMTB Logo" class="portal-header__logo"/>
+                    </button>
+
+                    <div class="slb-vertical-divider slds-m-right_medium slds-m-left_medium"></div>
+
+                    <div class="slb-subtitle">{portalHeader}</div>
+                </div>
+            </div>
+
+            <!-- Center tabs -->
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_7-of-12 slb-tabsWrap">
+                <nav class="slb-tabs" aria-label="SLB Tabs">
+                    <button class={therapistSearchTabClass} data-tab={therapistsearchTab} onclick={handleTabClick}>
+                        {label.therapistSearch}
+                    </button>
+                    <button class={reportsTabClass} data-tab={reportsTab} onclick={handleTabClick}>
+                        {label.reports}
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Right icons -->
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12 slds-text-align_right">
+                <!-- Gear Icon - Navigate to User Management -->
+                <template if:true={isSlbAdmin}>
+                    <button class="slds-button slds-button_icon slds-m-right_x-small" title="Setting" onclick={openSettings}>
+                        <img src={settingsIcon} alt="Settings" class="settings-icon" />
+                    </button>
+                </template>
+
+                <button class="slds-button slds-button_icon" title="Logout" onclick={handleLogout}>
+                    <img src={logoutIcon} alt="Logout" class="logout-icon" />
+                </button>
+            </div>
+        </div>
+
+        <!-- Bottom blue strip -->
+        <div class="slb-topbar"></div>
+    </header>
+</template>

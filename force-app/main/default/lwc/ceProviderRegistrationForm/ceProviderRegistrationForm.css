@@ -1,0 +1,184 @@
+/* Import portal styles - using content-wrap from global.css */
+.content-wrap {
+    font-family: Montserrat, sans-serif;
+    color: #3e3e3e;
+    max-width: 100%;
+}
+
+/* Header Section - matches portal page-header styling */
+.header-section {
+    background-color: #a3c0e1;
+    margin-bottom: 2em;
+    padding: 3em 1em;
+    position: relative;
+    overflow: hidden;
+}
+
+.header-section__image {
+    position: absolute;
+    bottom: 0;
+    height: 100%;
+    right: 0;
+    top: 0;
+    opacity: 0.5;
+    display: block;
+    z-index: 0;
+}
+
+@media screen and (min-width: 40em) {
+    .header-section {
+        padding: 3em 1em;
+        overflow: hidden;
+    }
+    
+    .header-section__image {
+        left: 50%;
+        right: auto;
+        height: 100%;
+        width: auto;
+    }
+}
+
+.page-title {
+    font-size: 2.25em;
+    font-weight: 700;
+    color: #3e3e3c;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    padding: 0;
+    display: block;
+}
+
+@media screen and (min-width: 64em) {
+    .page-title {
+        max-width: 60%;
+    }
+}
+
+.section-header {
+    background: rgba(54, 110, 171);
+    color: #ffffff;
+    font-weight: 700;
+    padding: 0.6rem 1rem;
+    margin: 1.5rem 0 1rem;
+    font-size: 16px;
+}
+
+/* Renewal form specific styles */
+.form-container {
+    background: #ffffff;
+    padding: 1.5rem 2rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto 2rem;
+}
+
+.form-description {
+    font-size: 14px;
+    margin-bottom: 1.5rem;
+    color: #333;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 3rem;
+    row-gap: 1rem;
+}
+
+.form-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-item.full-width {
+    grid-column: 1 / span 2;
+}
+
+.field-label.required::after {
+    content: '';
+}
+
+.display-field {
+    border: 1px solid #d8dde6;
+    padding: 0.5rem 0.75rem;
+    background: #f9f9f9;
+    font-size: 14px;
+    color: #333;
+}
+
+.field-label {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: #333;
+    text-transform: uppercase;
+}
+
+.pageBlockSection {
+    margin-bottom: 1rem;
+}
+
+.pageBlockSection.columns-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 2rem;
+}
+
+.pageBlockSection.columns-1 {
+    display: block;
+}
+
+.pageBlockSectionItem {
+    margin-bottom: 0.5rem;
+}
+
+.pageBlockSectionItem.span-2 {
+    grid-column: 1 / span 2;
+}
+
+.field-validation-message {
+    color: #c23934;
+    font-size: 12px;
+}
+
+.registration-content {
+    margin-bottom: 1.5rem;
+}
+
+.btn-container {
+    margin-top: 1.5rem;
+}
+
+/* Renewal Completed Popup Styles */
+.popup__wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.custPopup {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.custPopup__message {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #333333;
+    margin-bottom: 1.5rem;
+}

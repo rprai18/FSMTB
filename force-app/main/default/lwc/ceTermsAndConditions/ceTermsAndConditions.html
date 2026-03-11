@@ -1,0 +1,79 @@
+<template>
+    <!-- Loading State -->
+    <template if:true={isLoading}>
+        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+    </template>
+    
+    <!-- Error State -->
+    <template if:true={error}>
+        <div class="slds-m-around_medium slds-text-align_center">
+            <div class="slds-box slds-theme_error" style="background-color: #fef7f7; border: 1px solid #c23934; padding: 1rem;">
+                <lightning-icon icon-name="utility:error" alternative-text="Error" size="small" class="slds-m-right_x-small" style="color: #c23934;"></lightning-icon>
+                <span style="color: #c23934; font-weight: bold;">{error}</span>
+            </div>
+        </div>
+    </template>
+    
+    <!-- Main Content -->
+    <template if:false={isLoading}>
+            <!-- Header Section -->
+            <div class="header-section">
+                <!-- <img src={headerImage} alt="Header" class="header-section__image"/> -->
+                <h1 class="page-header__heading">{displaySiteName} Terms &amp; Conditions</h1>
+            </div>
+            
+            <!-- Content Wrap -->
+            <div class="content-wrap">
+                <div class="slds-text-align_center slds-m-bottom_medium">
+                    <p class="slds-text-heading_small">
+                        Acceptance of terms and conditions is required for access to {displaySiteName}.
+                    </p>
+                </div>
+                
+                <!-- Terms Text -->
+                <div class="terms-text slds-m-bottom_medium" data-id="termsText" lwc:dom="manual"></div>
+                
+                <!-- Accept Form -->
+                <template if:true={showAcceptButton}>
+                    <div class="slds-text-align_center slds-m-top_large slds-m-bottom_medium">
+                        <p class="slds-text-heading_small">
+                            By clicking "Accept," you are accepting terms and conditions.
+                        </p>
+                    </div>
+                    
+                    <!-- Accept Button -->
+                    <div class="slds-text-align_center accept-button-container">
+                        <lightning-button
+                            variant="brand"
+                            label="Accept"
+                            onclick={handleAccept}
+                            disabled={isLoading}
+                            class="accept-button">
+                        </lightning-button>
+                    </div>
+                </template>
+                
+                <!-- Admin Redirect Panel -->
+                <template if:true={showAdminRedirect}>
+                    <div class="popup__wrapper slds-m-top_large">
+                        <div class="custPopup popup__body slds-text-align_center">
+                            <div class="custPopup__message slds-m-bottom_medium">
+                                While processing this renewal, it was completed by another user. Please see the renewal information on the Account Administration page.
+                            </div>
+                            <lightning-button
+                                variant="brand"
+                                label="Ok"
+                                onclick={handleReturnToAdmin}>
+                            </lightning-button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+    </template>
+    
+    <!-- Footer -->
+    <!-- <div class="footer">
+        ©2025 FSMTB ALL RIGHTS RESERVED.
+    </div> -->
+</template>
+

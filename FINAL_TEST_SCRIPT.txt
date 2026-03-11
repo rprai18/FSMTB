@@ -1,0 +1,177 @@
+// ============================================
+// FINAL TEST SCRIPT - Using Course Records
+// Note: Both Membership_Expiration_Date__c and Survey_Total_Happy__c are Roll-Up Summary fields
+// We need to create related records to update them
+// ============================================
+
+// Test 1: Create New Account and verify default statuses
+Account testAcc = new Account(
+    Name = 'Test Account Status - ' + System.now(),
+    RecordTypeId = [SELECT Id FROM RecordType WHERE DeveloperName = 'CE_Provider' AND SobjectType = 'Account' LIMIT 1].Id
+);
+insert testAcc;
+
+Account result1 = [SELECT Membership_Status__c, Registration_Status__c, Registration_Status_Flag__c,
+                          Membership_Expiration_Date__c, Survey_Total_Happy__c
+                   FROM Account WHERE Id = :testAcc.Id];
+
+System.debug('========================================');
+System.debug('TEST 1: New Account Default Statuses');
+System.debug('========================================');
+System.debug('Account Name: ' + testAcc.Name);
+System.debug('Membership Status: ' + result1.Membership_Status__c); // Should be "Active"
+System.debug('Registration Status: ' + result1.Registration_Status__c); // Should be "Provisional"
+System.debug('Registration Status Flag: ' + result1.Registration_Status_Flag__c); // Should be false
+System.debug('Membership Expiration Date: ' + result1.Membership_Expiration_Date__c);
+System.debug('Survey Total Happy: ' + result1.Survey_Total_Happy__c);
+System.debug('Test 1 Result: ' + (result1.Membership_Status__c == 'Active' && result1.Registration_Status__c == 'Provisional' ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('========================================');
+
+// Test 2: Get Contact for Course records (needed to create Course records)
+Contact testContact;
+try {
+    testContact = [SELECT Id FROM Contact WHERE AccountId = :testAcc.Id LIMIT 1];
+} catch (Exception e) {
+    // Create a Contact if none exists
+    testContact = new Contact(
+        AccountId = testAcc.Id,
+        FirstName = 'Test',
+        LastName = 'Contact',
+        Email = 'test@example.com'
+    );
+    insert testContact;
+    System.debug('Created test Contact: ' + testContact.Id);
+}
+
+// Test 3: Create Course records with Survey_Total_Happy__c to test Registration Status
+// First, check what the Course object field name is for survey happy count
+try {
+    // Try to create Course records that will sum up to 50
+    // Note: You'll need to adjust field names based on your Course object structure
+    
+    // Option 1: If Course has Survey_Total_Happy__c field directly
+    // Create courses that sum to 50
+    List<Course__c> courses = new List<Course__c>();
+    
+    for (Integer i = 0; i < 5; i++) {
+        Course__c course = new Course__c(
+            Course_Name__c = 'Test Course ' + (i + 1),
+            Contact__c = testContact.Id,
+            // Survey_Total_Happy__c = 10  // Adjust based on actual field name
+        );
+        courses.add(course);
+    }
+    
+    // If Course object has a field that contributes to the roll-up, set it here
+    // For now, let's try a simpler approach - use existing accounts
+    
+    System.debug('Note: Course object structure may vary. Using existing account test instead.');
+    
+} catch (Exception e) {
+    System.debug('Error creating Course records: ' + e.getMessage());
+    System.debug('Stack Trace: ' + e.getStackTraceString());
+}
+
+// Test 4: Use an existing Account that already has Courses/Memberships
+// This is easier for testing since roll-up fields are already populated
+System.debug('========================================');
+System.debug('TEST 2: Test with Existing Account');
+System.debug('========================================');
+
+try {
+    // Find an existing Account with some data
+    Account existingAcc = [SELECT Id, Name, Membership_Status__c, Registration_Status__c,
+                                  Registration_Status_Flag__c, Registration_Status_Date__c,
+                                  Membership_Expiration_Date__c, Survey_Total_Happy__c,
+                                  Allow_Renewal__c, RecordType.DeveloperName
+                           FROM Account 
+                           WHERE RecordType.DeveloperName = 'CE_Provider'
+                           AND (Survey_Total_Happy__c != null OR Membership_Expiration_Date__c != null)
+                           LIMIT 1];
+    
+    System.debug('Using Existing Account: ' + existingAcc.Name);
+    System.debug('Current Membership Status: ' + existingAcc.Membership_Status__c);
+    System.debug('Current Registration Status: ' + existingAcc.Registration_Status__c);
+    System.debug('Survey Total Happy: ' + existingAcc.Survey_Total_Happy__c);
+    System.debug('Membership Expiration Date: ' + existingAcc.Membership_Expiration_Date__c);
+    System.debug('');
+    System.debug('✅ To test Registration Status changes:');
+    System.debug('   1. Create/update Course records with Survey_Total_Happy__c values');
+    System.debug('   2. Roll-up will automatically update Account.Survey_Total_Happy__c');
+    System.debug('   3. Trigger will recalculate Registration_Status__c');
+    System.debug('');
+    System.debug('✅ To test Membership Status changes:');
+    System.debug('   1. Create/update Membership__c records with Expiration_Date__c');
+    System.debug('   2. Roll-up will automatically update Account.Membership_Expiration_Date__c');
+    System.debug('   3. Trigger will recalculate Membership_Status__c');
+    System.debug('');
+    
+} catch (Exception e) {
+    System.debug('Error finding existing account: ' + e.getMessage());
+}
+
+// Test 5: Test Provisional Action Prevention (doesn't require roll-up fields)
+System.debug('========================================');
+System.debug('TEST 3: Provisional Action Prevention');
+System.debug('========================================');
+
+try {
+    CEActionController.submitAction(
+        testAcc.Id, 
+        'Provisional', // This should be rejected
+        String.valueOf(System.today()), 
+        'Test reason'
+    );
+    System.debug('Test 3 Result: FAIL ❌ (Should have thrown error)');
+} catch (Exception e) {
+    System.debug('Error Message: ' + e.getMessage());
+    System.debug('Test 3 Result: ' + (e.getMessage().contains('Provisional') ? 'PASS ✅' : 'FAIL ❌'));
+}
+
+// Test 6: Test Valid Action Creation
+System.debug('========================================');
+System.debug('TEST 4: Valid Action Creation');
+System.debug('========================================');
+
+try {
+    CEActionController.submitAction(
+        testAcc.Id, 
+        'Under Review', // Valid action
+        String.valueOf(System.today()), 
+        'Test reason'
+    );
+    
+    Account result6 = [SELECT Current_Active_Action_Status__c FROM Account WHERE Id = :testAcc.Id];
+    System.debug('Action Status: ' + result6.Current_Active_Action_Status__c); // Should be "Under Review"
+    System.debug('Test 4 Result: ' + (result6.Current_Active_Action_Status__c == 'Under Review' ? 'PASS ✅' : 'FAIL ❌'));
+} catch (Exception e) {
+    System.debug('Error: ' + e.getMessage());
+    System.debug('Test 4 Result: FAIL ❌');
+}
+
+// Test 7: Verify Available Actions (should not include Provisional)
+System.debug('========================================');
+System.debug('TEST 5: Available Actions List');
+System.debug('========================================');
+
+List<String> availableActions = CEActionController.getAvailableActions(testAcc.Id);
+System.debug('Available Actions: ' + availableActions);
+Boolean hasProvisional = availableActions.contains('Provisional') || 
+                         availableActions.contains('Provisional & Restricted') ||
+                         availableActions.contains('Provisional & Under Review') ||
+                         availableActions.contains('Provisional & Internal Investigation');
+System.debug('Contains Provisional actions: ' + hasProvisional);
+System.debug('Test 5 Result: ' + (!hasProvisional ? 'PASS ✅' : 'FAIL ❌'));
+System.debug('========================================');
+
+System.debug('========================================');
+System.debug('TESTS COMPLETED');
+System.debug('========================================');
+System.debug('');
+System.debug('NOTE: To fully test Registration/Membership Status:');
+System.debug('  1. Create Course records with Survey_Total_Happy__c values');
+System.debug('  2. Create Membership__c records with Expiration_Date__c values');
+System.debug('  3. Roll-up fields will update automatically');
+System.debug('  4. Trigger will recalculate statuses');
+System.debug('========================================');
+

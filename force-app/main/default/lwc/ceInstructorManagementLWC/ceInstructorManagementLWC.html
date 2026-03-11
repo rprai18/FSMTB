@@ -1,0 +1,119 @@
+<template>
+    <div>
+        <div style="font-family: Arial, Helvetica, sans-serif;" class="slds-m-around_medium">
+            <h1 style="font-size: 32px; font-weight: 700; margin: 0 0 12px 0;">
+                {label.imHeader}
+            </h1>
+
+            <p style="font-size: 16px; line-height: 1.6; margin: 0 0 12px 0;">
+                {label.descOne}
+            </p>
+
+            <p style="font-size: 16px; line-height: 1.6; margin: 0;">
+                {label.descTwo}
+            </p>
+        </div>
+    </div>
+
+    <div class="slds-p-around_medium">
+        <!-- Top row: New button -->
+        <div class="slds-grid slds-grid_align-end slds-m-bottom_medium">
+            <lightning-button
+                label="Add Instructor"
+                variant="brand"
+                icon-name="utility:add"
+                title="Add Instructor"
+                onclick={handleNew}>
+            </lightning-button>
+        </div>
+
+        <!-- Active Instructors -->
+        <div class="slds-m-bottom_large slds-box slds-theme_default">
+            <h2 class="section-title">{label.activeInstLbl}</h2>
+            <lightning-datatable
+                data={activeData}
+                columns={columns}
+                key-field="Id"
+                onrowaction={handleRowAction}
+                hide-checkbox-column>
+            </lightning-datatable>
+        </div>
+
+        <!-- Inactive Instructors -->
+        <div class="slds-box slds-theme_default">
+            <h2 class="section-title">{label.inactiveInsLbl}</h2>
+            <lightning-datatable
+                data={inactiveData}
+                columns={columns}
+                key-field="Id"
+                onrowaction={handleRowAction}
+                hide-checkbox-column>
+            </lightning-datatable>
+        </div>
+    </div>
+
+    <!-- Edit modal -->
+    <template if:true={isEditOpen}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close" title="Close" onclick={closeEdit}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 class="slds-text-heading_medium">{label.editInstHeader}</h2>
+                </header>
+                <div class="slds-modal__content">
+                    <lightning-record-edit-form object-api-name="Instructor__c" record-id={editingRecordId} onsuccess={handleEditSuccess} onerror={handleError}>
+                        <lightning-messages></lightning-messages>
+                        <div class="slds-grid slds-wrap slds-m-around_x-small">
+                            <div class="slds-col slds-size_1-of-1"><lightning-input-field field-name="First_Name__c"></lightning-input-field></div>
+                            <div class="slds-col slds-size_1-of-1"><lightning-input-field field-name="Middle_Name__c"></lightning-input-field></div>
+                            <div class="slds-col slds-size_1-of-1"><lightning-input-field field-name="Last_Name__c"></lightning-input-field></div>
+                            <div class="slds-col slds-size_1-of-1"><lightning-input-field field-name="Also_Known_As__c"></lightning-input-field></div>
+                            <div class="slds-col slds-size_1-of-1"><lightning-input-field field-name="Status__c" required="true"></lightning-input-field></div>
+                        </div>
+                        <footer class="slds-modal__footer slds-grid slds-align_absolute-center">
+                            <lightning-button variant="neutral" label="Cancel" onclick={closeEdit}></lightning-button>
+                            <lightning-button class="slds-m-left_x-small" variant="brand" type="submit" label="Save"></lightning-button>
+                        </footer>
+                    </lightning-record-edit-form>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+
+    <!-- New Instructor modal -->
+    <template if:true={isNewOpen}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close" title="Close" onclick={closeNew}>
+                        <lightning-icon icon-name="utility:close" alternative-text="close"></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 class="slds-text-heading_medium">{label.addNewInstHeader}</h2>
+                </header>
+                <div class="slds-modal__content">
+                    <lightning-record-edit-form object-api-name="Instructor__c" onsuccess={handleNewSuccess} onerror={handleError}>
+                        <lightning-messages></lightning-messages>
+                        <div class="slds-grid slds-wrap slds-m-around_x-small">
+                            <div class="slds-col slds-size_1-of-1"><lightning-input-field field-name="Account__c" value={accountId} class="slds-hide"></lightning-input-field></div>
+                            <div class="slds-col slds-size_1-of-1"><lightning-input-field field-name="First_Name__c"></lightning-input-field></div>
+                            <div class="slds-col slds-size_1-of-1"><lightning-input-field field-name="Middle_Name__c"></lightning-input-field></div>
+                            <div class="slds-col slds-size_1-of-1"><lightning-input-field field-name="Last_Name__c"></lightning-input-field></div>
+                            <div class="slds-col slds-size_1-of-1"><lightning-input-field field-name="Also_Known_As__c"></lightning-input-field></div>
+                            <div class="slds-col slds-size_1-of-1"><lightning-input-field field-name="Status__c" required="true" value={statusVal}></lightning-input-field></div>
+                        </div>
+                        <footer class="slds-modal__footer slds-grid slds-align_absolute-center">
+                            <lightning-button variant="neutral" label="Cancel" onclick={closeNew}></lightning-button>
+                            <lightning-button class="slds-m-left_x-small" variant="brand" type="submit" label="Save"></lightning-button>
+                        </footer>
+                    </lightning-record-edit-form>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

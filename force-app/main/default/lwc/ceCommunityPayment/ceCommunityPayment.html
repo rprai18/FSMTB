@@ -1,0 +1,252 @@
+<template>
+    <div class="payment-container content-wrap">
+        <!-- Loading State -->
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+
+        <!-- Error State -->
+        <template if:true={error}>
+            <div class="slds-m-around_medium">
+                <lightning-icon icon-name="utility:error" size="small" class="slds-m-right_x-small"></lightning-icon>
+                <span>{error}</span>
+            </div>
+        </template>
+
+        <!-- Main Content -->
+        <template if:false={isLoading}>
+            <template if:false={error}>
+                <!-- Header Section -->
+                <div class="header-section">
+                    <!-- <img src={headerImage0} alt="Header" class="header-section__image"/> -->
+                    <h1 class="page-title">Payment Information</h1>
+                </div>
+
+                <!-- Content Section -->
+                <div class="content-wrap content-wrap--skinny">
+                    <!-- Fee Content and Amount -->
+                    <template if:true={paymentData}>
+                        <template if:true={paymentData.feeContent}>
+                            <p class="fee-content">
+                                <strong>{paymentData.feeContent}{formattedAmount}</strong>
+                            </p>
+                        </template>
+
+                        <!-- Payment Content (HTML) -->
+                        <template if:true={paymentData.content}>
+                            <div class="content-section" lwc:dom="manual"></div>
+                        </template>
+                    </template>
+
+                    <!-- Payment Form -->
+                    <form class="form js-payment-form" onsubmit={handleSubmit}>
+                        <!-- Form Error Message -->
+                        <template if:true={showFormError}>
+                            <div class="form-error-message slds-box slds-theme_error slds-m-bottom_medium">
+                                <lightning-icon icon-name="utility:error" size="small" class="slds-m-right_x-small"></lightning-icon>
+                                <span>{formError}</span>
+                            </div>
+                        </template>
+
+                        <fieldset>
+                            <legend class="legend legend--primary">Credit Card Information</legend>
+
+                            <!-- Card Number -->
+                            <div class="field slds-form-element slds-m-bottom_medium">
+                                <label for="ccn" class="slds-form-element__label">
+                                    Card Number
+                                </label>
+                                <div class="slds-form-element__control">
+                                    <lightning-input
+                                        type="text"
+                                        name="ccn"
+                                        value={cardNumber}
+                                        onchange={handleInputChange}
+                                        maxlength="16"
+                                        pattern="\d+"
+                                        message-when-pattern-mismatch="Credit card number must be numeric"
+                                        required>
+                                    </lightning-input>
+                                </div>
+                            </div>
+
+                            <!-- Expiration Date -->
+                            <fieldset class="field-group slds-form-element slds-m-bottom_medium">
+                                <legend class="slds-form-element__label field-group__label">
+                                    Expiration Date
+                                </legend>
+                                <div class="field-list field-list--inline slds-grid slds-gutters">
+                                    <div class="field field-list__item slds-col slds-size_1-of-2">
+                                        <label for="month" class="slds-form-element__label slds-assistive-text">
+                                            Month
+                                        </label>
+                                        <div class="slds-form-element__control">
+                                            <lightning-combobox
+                                                name="month"
+                                                value={expMonth}
+                                                options={monthOptions}
+                                                onchange={handleInputChange}
+                                                placeholder="MM"
+                                                required>
+                                            </lightning-combobox>
+                                        </div>
+                                    </div>
+                                    <div class="field field-list__item slds-col slds-size_1-of-2">
+                                        <label for="year" class="slds-form-element__label slds-assistive-text">
+                                            Year
+                                        </label>
+                                        <div class="slds-form-element__control">
+                                            <lightning-combobox
+                                                name="year"
+                                                value={expYear}
+                                                options={yearOptions}
+                                                onchange={handleInputChange}
+                                                placeholder="YYYY"
+                                                required>
+                                            </lightning-combobox>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <!-- Security Code -->
+                            <div class="field slds-form-element slds-m-bottom_medium">
+                                <label for="cvn" class="slds-form-element__label">
+                                    Security Code
+                                </label>
+                                <div class="slds-form-element__control">
+                                    <lightning-input
+                                        type="password"
+                                        name="cvn"
+                                        value={cvv}
+                                        onchange={handleInputChange}
+                                        maxlength="3"
+                                        minlength="3"
+                                        pattern="\d+"
+                                        message-when-pattern-mismatch="Security code must be numeric"
+                                        required>
+                                    </lightning-input>
+                                </div>
+                            </div>
+
+                            <!-- First Name -->
+                            <div class="field slds-form-element slds-m-bottom_medium">
+                                <label for="firstName" class="slds-form-element__label">
+                                    First Name
+                                </label>
+                                <div class="slds-form-element__control">
+                                    <lightning-input
+                                        type="text"
+                                        name="firstName"
+                                        value={firstName}
+                                        onchange={handleInputChange}
+                                        required>
+                                    </lightning-input>
+                                </div>
+                            </div>
+
+                            <!-- Last Name -->
+                            <div class="field slds-form-element slds-m-bottom_medium">
+                                <label for="lastName" class="slds-form-element__label">
+                                    Last Name
+                                </label>
+                                <div class="slds-form-element__control">
+                                    <lightning-input
+                                        type="text"
+                                        name="lastName"
+                                        value={lastName}
+                                        onchange={handleInputChange}
+                                        required>
+                                    </lightning-input>
+                                </div>
+                            </div>
+
+                            <!-- Billing Address -->
+                            <div class="field slds-form-element slds-m-bottom_medium">
+                                <label for="address" class="slds-form-element__label">
+                                    Billing Address
+                                </label>
+                                <div class="slds-form-element__control">
+                                    <lightning-input
+                                        type="text"
+                                        name="address"
+                                        value={billingAddress}
+                                        onchange={handleInputChange}
+                                        required>
+                                    </lightning-input>
+                                </div>
+                            </div>
+
+                            <!-- Billing City -->
+                            <div class="field slds-form-element slds-m-bottom_medium">
+                                <label for="city" class="slds-form-element__label">
+                                    Billing City
+                                </label>
+                                <div class="slds-form-element__control">
+                                    <lightning-input
+                                        type="text"
+                                        name="city"
+                                        value={billingCity}
+                                        onchange={handleInputChange}
+                                        required>
+                                    </lightning-input>
+                                </div>
+                            </div>
+
+                            <!-- Billing State -->
+                            <div class="field slds-form-element slds-m-bottom_medium">
+                                <label for="state" class="slds-form-element__label">
+                                    Billing State
+                                </label>
+                                <div class="slds-form-element__control">
+                                    <lightning-combobox
+                                        name="state"
+                                        value={billingState}
+                                        options={stateOptions}
+                                        onchange={handleInputChange}
+                                        placeholder="--None--"
+                                        required>
+                                    </lightning-combobox>
+                                </div>
+                            </div>
+
+                            <!-- Billing Zip Code -->
+                            <div class="field slds-form-element slds-m-bottom_medium">
+                                <label for="postalCode" class="slds-form-element__label">
+                                    Billing Zip Code
+                                </label>
+                                <div class="slds-form-element__control">
+                                    <lightning-input
+                                        type="text"
+                                        name="postalCode"
+                                        value={billingZip}
+                                        onchange={handleInputChange}
+                                        pattern="^\d{5}(?:[- ]\d{4})?$"
+                                        message-when-pattern-mismatch="XXXXX or XXXXX-XXXX"
+                                        required>
+                                    </lightning-input>
+                                </div>
+                            </div>
+
+                            <!-- Authorization Text -->
+                            <p class="authorization-text slds-m-vertical_medium">
+                                By clicking this button, I authorize payment. Please press "Submit" only once.
+                            </p>
+
+                            <!-- Submit Button -->
+                            <div class="js-button-wrap slds-m-top_medium">
+                                <lightning-button
+                                    type="submit"
+                                    variant="brand"
+                                    label="Submit"
+                                    disabled={isSubmitting}>
+                                </lightning-button>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </template>
+        </template>
+    </div>
+</template>
+

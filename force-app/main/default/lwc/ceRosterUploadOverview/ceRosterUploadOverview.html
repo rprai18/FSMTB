@@ -1,0 +1,34 @@
+<template>
+    <header class="page-header">
+        <div class="header-left">
+            <img src={faviconUrl} alt="FSMTB Logo" class="favicon" />
+            <h1 class="title">CE Roster Upload Overview</h1>
+        </div>
+        <div class="header-right">
+            <span class="user-info">
+                Hello, {userName} of {organizationName}.
+            </span>
+            <a href={logoutUrl} class="logout-link">Logout</a>
+        </div>
+    </header>
+
+    <nav class="nav-tabs">
+        <span class={tabClassRoster} data-tab="roster" onclick={handleTabClick}>Roster Upload</span>
+        <span class={tabClassCourses} data-tab="courses" onclick={handleTabClick}>Course Management</span>
+        <span class={tabClassSurveys} data-tab="surveys" onclick={handleTabClick}>Survey Feedback</span>
+        <span class={tabClassInstructors} data-tab="instructors" onclick={handleTabClick}>Instructor Management</span>
+        <span class={tabClassAdmin} data-tab="admin" onclick={handleTabClick}>Account Administration</span>
+    </nav>
+
+    <section class="content-area">
+        <template if:true={showRosterUpload}>
+            <c-my-roster-upload></c-my-roster-upload>
+        </template>
+
+        <template if:true={showPlaceholder}>
+            <div class="placeholder">
+                <p>Select a tab to begin managing your CE Provider tools.</p>
+            </div>
+        </template>
+    </section>
+</template>

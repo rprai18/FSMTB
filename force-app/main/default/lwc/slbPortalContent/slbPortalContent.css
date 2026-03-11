@@ -1,0 +1,4 @@
+/* Router wrapper: no extra layout; children define their own styles */
+:host {
+    display: block;
+}
